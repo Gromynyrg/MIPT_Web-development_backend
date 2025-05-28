@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # База данных для Product Service
+  product_db:
+    image: postgres:15-alpine
+    container_name: lampochka_product_db
+    environment:
+      POSTGRES_USER: ${PRODUCT_DB_USER:-prod_user}
+      POSTGRES_PASSWORD: ${PRODUCT_DB_PASSWORD:-prod_password}
+      POSTGRES_DB: ${PRODUCT_DB_NAME:-product_service_db}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - product_postgres_data:/var/lib/postgresql/data/pgdata
+      - ./db_init_scripts/product_service:/docker-entrypoint-initdb.d # Скрипты для Product DB
+    ports:
+      - "${PRODUCT_DB_PORT:-5433}:5432" # Используем другой порт на хосте, например 5433
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PRODUCT_DB_USER:-prod_user} -d ${PRODUCT_DB_NAME:-product_service_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Микросервис Product Service
+  product_service:
+    build:
+      context: ./product_service # Путь к Dockerfile и коду сервиса
+      dockerfile: Dockerfile
+    container_name: lampochka_product_service
+    environment:
+      # Передаем URL БД в контейнер сервиса
+      # Имена переменных должны совпадать с теми, что ожидает app/config.py
+      PRODUCT_DATABASE_URL: "postgresql+psycopg2://${PRODUCT_DB_USER:-prod_user}:${PRODUCT_DB_PASSWORD:-prod_password}@product_db:5432/${PRODUCT_DB_NAME:-product_service_db}"
+      # PYTHONUNBUFFERED: 1 # Полезно для немедленного вывода логов Python в Docker
+    volumes:
+      - ./product_service/app:/app/product_service/app # Монтируем код для live reload (только для разработки!)
+    ports:
+      - "${PRODUCT_SERVICE_PORT:-8001}:8000" # Маппим порт 8000 контейнера на порт 8001 хоста
+    depends_on:
+      product_db: # Запускаем сервис только после того, как БД готова (по healthcheck)
+        condition: service_healthy
+    restart: unless-stopped
+
+  # База данных для Order Service
+  order_db:
+    image: postgres:15-alpine
+    container_name: lampochka_order_db
+    environment:
+      POSTGRES_USER: ${ORDER_DB_USER:-order_user}
+      POSTGRES_PASSWORD: ${ORDER_DB_PASSWORD:-order_password}
+      POSTGRES_DB: ${ORDER_DB_NAME:-order_service_db}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - order_postgres_data:/var/lib/postgresql/data/pgdata
+      - ./db_init_scripts/order_service:/docker-entrypoint-initdb.d # Скрипты для Order DB
+    ports:
+      - "${ORDER_DB_PORT:-5434}:5432" # Используем другой порт на хосте, например 5434
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ORDER_DB_USER:-order_user} -d ${ORDER_DB_NAME:-order_service_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  product_postgres_data:
+  order_postgres_data:
