@@ -35,6 +35,7 @@ services:
       # PYTHONUNBUFFERED: 1 # Полезно для немедленного вывода логов Python в Docker
     volumes:
       - ./product_service/app:/app/product_service/app # Монтируем код для live reload (только для разработки!)
+      - product_service_static_data:/app/product_service/app/static
     ports:
       - "${PRODUCT_SERVICE_PORT:-8001}:8000" # Маппим порт 8000 контейнера на порт 8001 хоста
     depends_on:
@@ -63,6 +64,27 @@ services:
       timeout: 5s
       retries: 5
 
+  order_service:
+    build:
+      context: ./order_service # Путь к Dockerfile и коду Order Service
+      dockerfile: Dockerfile
+    container_name: lampochka_order_service
+    environment:
+      ORDER_DATABASE_URL: "postgresql+psycopg2://${ORDER_DB_USER:-order_user}:${ORDER_DB_PASSWORD:-order_password}@order_db:5432/${ORDER_DB_NAME:-order_service_db}"
+      # Если Order Service будет вызывать Product Service:
+      # PRODUCT_SERVICE_BASE_URL: "http://product_service:8000/api/v1" # product_service - имя контейнера, 8000 - его внутренний порт
+      PYTHONUNBUFFERED: 1
+    volumes:
+      - ./order_service/app:/app/order_service/app # Для разработки
+    ports:
+      - "${ORDER_SERVICE_PORT:-8002}:8000" # Маппинг порта контейнера 8000 на хост
+    depends_on:
+      order_db: # Зависит от своей БД
+        condition: service_healthy
+    restart: unless-stopped
+
+
 volumes:
   product_postgres_data:
   order_postgres_data:
+  product_service_static_data: {}

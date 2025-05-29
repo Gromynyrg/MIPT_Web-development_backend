@@ -1,75 +1,78 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, File, UploadFile
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import uuid
 
-from app import crud, models, schemas  # Импортируем из корневой папки app
-from app.db import get_db  # Импортируем зависимость для сессии БД
+from app import crud, models, schemas
+from app.db import get_db
+from app.utils_uploads import save_upload_file_sync, save_upload_file_async, delete_physical_image
 
 router = APIRouter(
-    prefix="/products",  # Префикс для всех эндпоинтов в этом роутере
-    tags=["Products"],  # Тег для группировки в документации Swagger
+    prefix="/products",
+    tags=["Products"],
 )
 
 
-# --- Эндпоинты для Товаров ---
-
 @router.post("/", response_model=schemas.Product, status_code=status.HTTP_201_CREATED)
-def create_product_endpoint(product: schemas.ProductCreate, db: Session = Depends(get_db)):
-    """
-    Создать новый товар.
+async def api_create_product_with_images(
+        product_form_data: schemas.ProductCreateForm = Depends(schemas.ProductCreateForm.as_form),
+        images: Optional[List[UploadFile]] = File(None, description="Файлы изображений товара (опционально)"),
+        db: Session = Depends(get_db)
+):
+    product_create_schema = schemas.ProductCreate(**product_form_data.model_dump())
 
-    - **name**: Название товара (уникальное)
-    - **article**: Артикул товара (уникальный)
-    - **price**: Цена
-    - **images_urls**: Опциональный список URL изображений для товара.
-    """
     try:
-        db_product = crud.create_product(db=db, product=product)
-    except ValueError as e:
+        # Вызываем обновленный CRUD, который сам обрабатывает файлы
+        db_product = crud.create_product(
+            db=db,
+            product_data=product_create_schema,
+            image_files=images if images else []
+        )
+    except ValueError as e:  # Ошибки валидации, сохранения файлов, IntegrityError от CRUD
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except RuntimeError as e:  # Непредвиденные ошибки от CRUD
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    except Exception as e:  # Любые другие непредвиденные ошибки
+        # Логируем неизвестную ошибку
+        print(f"API: UNEXPECTED ERROR during product creation: {type(e).__name__} - {str(e)}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="An unexpected server error occurred.")
+
     return db_product
 
 
-@router.get("/", response_model=List[schemas.ProductInList])  # Используем упрощенную схему для списка
-def read_products_endpoint(
-        skip: int = Query(0, ge=0, description="Количество пропускаемых записей (для пагинации)"),
-        limit: int = Query(20, ge=1, le=100, description="Максимальное количество записей для возврата"),
-        db: Session = Depends(get_db)
+@router.get("/", response_model=List[schemas.ProductInList])
+def api_read_products(
+        skip: int = Query(0, ge=0), limit: int = Query(20, ge=1, le=100), db: Session = Depends(get_db)
 ):
-    """
-    Получить список товаров с пагинацией.
-    """
-    products = crud.get_products(db, skip=skip, limit=limit)
-    # Можно добавить логику для формирования main_image_url, если она есть
-    # return [schemas.ProductInList(**prod.__dict__, main_image_url=prod.images[0].image_url if prod.images else None) for prod in products]
-    return products
+    products = crud.get_all_products(db, skip=skip, limit=limit)
+    results = []
+    for p in products:
+        main_image_url = p.images[0].image_url if p.images else None
+        results.append(schemas.ProductInList(
+            product_id=p.product_id, name=p.name, article=p.article,
+            price=p.price, main_image_url=main_image_url
+        ))
+    return results
 
 
 @router.get("/{product_id}", response_model=schemas.Product)
-def read_product_endpoint(product_id: uuid.UUID, db: Session = Depends(get_db)):
-    """
-    Получить детальную информацию о товаре по его ID.
-    """
-    db_product = crud.get_product(db, product_id=product_id)
+def api_read_product(product_id: uuid.UUID, db: Session = Depends(get_db)):
+    db_product = crud.get_product_by_id(db, product_id=product_id)
     if db_product is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
     return db_product
 
 
 @router.put("/{product_id}", response_model=schemas.Product)
-def update_product_endpoint(product_id: uuid.UUID, product: schemas.ProductUpdate, db: Session = Depends(get_db)):
-    """
-    Полностью обновить информацию о товаре.
-    Все поля из схемы ProductUpdate должны быть переданы (или будут установлены в None/дефолтные значения, если они опциональны в схеме ProductBase).
-    Для частичного обновления используйте PATCH.
-    """
-    # Для PUT, обычно ProductUpdate должен быть почти как ProductCreate (все поля обязательны)
-    # Если ProductUpdate содержит Optional поля, это больше похоже на PATCH.
-    # Мы будем использовать ProductUpdate как есть, но для строгого PUT можно создать ProductPut схему.
+def api_update_product(
+        product_id: uuid.UUID, product_update_data: schemas.ProductUpdate, db: Session = Depends(get_db)
+):
+    # Этот эндпоинт НЕ обновляет изображения. Только данные товара.
     try:
-        updated_product = crud.update_product(db=db, product_id=product_id, product_update=product)
-    except ValueError as e:  # Ловим ошибки уникальности из CRUD
+        updated_product = crud.update_existing_product(db=db, product_id=product_id,
+                                                       product_update_data=product_update_data)
+    except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
     if updated_product is None:
@@ -77,59 +80,81 @@ def update_product_endpoint(product_id: uuid.UUID, product: schemas.ProductUpdat
     return updated_product
 
 
-@router.patch("/{product_id}", response_model=schemas.Product)
-def partial_update_product_endpoint(product_id: uuid.UUID, product: schemas.ProductUpdate,
-                                    db: Session = Depends(get_db)):
-    """
-    Частично обновить информацию о товаре.
-    Передавайте только те поля, которые хотите изменить.
-    """
-    try:
-        updated_product = crud.update_product(db=db, product_id=product_id, product_update=product)
-    except ValueError as e:  # Ловим ошибки уникальности из CRUD
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
-    if updated_product is None:
+@router.delete("/{product_id}", response_model=schemas.Product)  # или status_code=204
+def api_delete_product(product_id: uuid.UUID, db: Session = Depends(get_db)):
+    db_product = crud.get_product_by_id(db, product_id=product_id)  # Получаем товар ДО удаления
+    if db_product is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
-    return updated_product
+
+    # Собираем URL изображений для физического удаления
+    image_urls_to_delete = [img.image_url for img in db_product.images]
+
+    deleted_product_from_db = crud.delete_product_by_id(db=db, product_id=product_id)
+
+    if deleted_product_from_db:
+        for url in image_urls_to_delete:
+            delete_physical_image(url)
+
+    return db_product
 
 
-@router.delete("/{product_id}", response_model=schemas.Product)  # Или можно возвращать status_code=204 NO CONTENT
-def delete_product_endpoint(product_id: uuid.UUID, db: Session = Depends(get_db)):
-    """
-    Удалить товар по ID.
-    """
-    deleted_product = crud.delete_product(db=db, product_id=product_id)
-    if deleted_product is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
-    return deleted_product  # Возвращаем удаленный объект для подтверждения
-
-
-# --- Эндпоинты для Изображений Товара (пример) ---
-# Их можно вынести в отдельный роутер, если их будет много
-
-@router.post("/{product_id}/images/", response_model=schemas.ProductImage, status_code=status.HTTP_201_CREATED)
-def create_image_for_product_endpoint(
+# --- Эндпоинты для управления изображениями существующего товара ---
+@router.post("/{product_id}/images/", response_model=List[schemas.ProductImage], status_code=status.HTTP_201_CREATED)
+async def api_upload_additional_images(
         product_id: uuid.UUID,
-        image: schemas.ProductImageCreate,
+        files: List[UploadFile] = File(...),
         db: Session = Depends(get_db)
 ):
-    """
-    Добавить новое изображение к существующему товару.
-    """
-    db_product = crud.get_product(db, product_id=product_id)
+    db_product = crud.get_product_by_id(db, product_id=product_id)
     if not db_product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
 
-    return crud.create_product_image(db=db, image=image, product_id=product_id)
+    created_db_images = []
+    physically_saved_image_urls_for_cleanup = []
+
+    try:
+        for file_to_upload in files:
+            public_url = await save_upload_file_async(file_to_upload, product_id)
+            physically_saved_image_urls_for_cleanup.append(public_url)
+
+            image_schema = schemas.ProductImageCreate(image_url=public_url)
+            img_model = crud.create_db_product_image(db=db, image_data=image_schema, product_id=product_id)
+            created_db_images.append(img_model)
+
+        db.commit()
+        for img_model in created_db_images:  # Обновляем каждую модель, чтобы получить сгенерированные БД поля (product_image_id, upload_at)
+            db.refresh(img_model)
+    except (ValueError, IOError) as e:
+        db.rollback()
+        for url in physically_saved_image_urls_for_cleanup:
+            delete_physical_image(url)
+        detail_msg = str(e)
+        if isinstance(e, ValueError):  # Ошибка валидации типа файла
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail_msg)
+        else:  # IOError
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                detail=f"Failed to save image: {detail_msg}")
+    except Exception as e_db:  # Другие ошибки БД
+        db.rollback()
+        for url in physically_saved_image_urls_for_cleanup:
+            delete_physical_image(url)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=f"Database or unexpected error: {str(e_db)}")
+
+    return created_db_images
 
 
 @router.delete("/images/{image_id}", response_model=schemas.ProductImage)
-def delete_image_endpoint(image_id: uuid.UUID, db: Session = Depends(get_db)):
-    """
-    Удалить изображение товара по ID изображения.
-    """
-    deleted_image = crud.delete_product_image(db=db, product_image_id=image_id)
-    if not deleted_image:
+def api_delete_image(image_id: uuid.UUID, db: Session = Depends(get_db)):
+    db_image = crud.get_db_product_image(db=db, product_image_id=image_id)
+    if not db_image:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Image not found")
-    return deleted_image
+
+    image_url_to_delete = db_image.image_url
+
+    crud.delete_db_product_image(db=db, product_image_id=image_id)
+    db.commit()
+
+    delete_physical_image(image_url_to_delete)
+
+    return db_image
