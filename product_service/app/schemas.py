@@ -109,6 +109,7 @@ class ProductInList(BaseModel): # Упрощенная схема для спи�
     name: str
     article: str
     price: Decimal
+    stock_quantity: int
     main_image_url: Optional[str] = None # URL главного изображения
 
     class Config:

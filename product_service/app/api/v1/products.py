@@ -60,7 +60,7 @@ def api_read_products(
     for p in products_models:
         main_image_url = p.images[0].image_url if p.images else None
         items_response.append(schemas.ProductInList(
-            product_id=p.product_id, name=p.name, article=p.article,
+            product_id=p.product_id, name=p.name, article=p.article, stock_quantity=p.stock_quantity,
             price=p.price, main_image_url=main_image_url
         ))
 
