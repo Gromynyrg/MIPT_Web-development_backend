@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request, Response, Body, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Response, Body
+from starlette.datastructures import UploadFile
 from fastapi.responses import JSONResponse
 from typing import Any, List, Optional, Dict
 import httpx
@@ -33,50 +34,61 @@ async def handle_proxy_response(response: httpx.Response) -> JSONResponse:
 async def create_product_proxy(request: Request, current_user: AdminUserSchema = Depends(get_current_active_admin)):
     target_url = f"{PRODUCT_SERVICE_URL}/products/"
 
-    form_data_from_frontend = await request.form()  # Это объект FormData
+    form_data_from_frontend = await request.form()  # Это объект starlette.datastructures.FormData
 
-    files_for_httpx: List[tuple[str, tuple[str, bytes, str]]] = []  # Список для файлов (ключ, (имя_файла, байты, тип))
-    data_for_httpx: Dict[str, str] = {}  # Словарь для обычных данных формы
+    files_to_send_to_httpx: List[tuple[str, tuple[str, bytes, str]]] = []
+    data_to_send_to_httpx: Dict[str, str] = {}
 
-    # Перебираем элементы FormData
-    for key in form_data_from_frontend:
-        value = form_data_from_frontend.getlist(
-            key)  # Используем getlist для полей, которые могут быть множественными (как images)
+    print(f"Admin Proxy: Received form data keys from frontend: {list(form_data_from_frontend.keys())}")
 
-        # В нашем случае 'images' - это ключ для файлов
-        if key == "images":  # Или тот ключ, который фронтенд использует для файлов
-            for file_obj in value:  # value будет списком UploadFile объектов
-                if isinstance(file_obj, UploadFile):
-                    content = await file_obj.read()
-                    # Для Product Service, который ожидает List[UploadFile] = File(...) под именем 'images',
-                    # мы должны передать несколько файлов с одним и тем же ключом 'images'.
-                    files_for_httpx.append((key, (file_obj.filename, content, file_obj.content_type)))
-                    await file_obj.close()
-                else:
-                    # Это странно, если под ключом 'images' пришло не UploadFile
-                    print(f"Warning: received non-UploadFile data for key '{key}': {type(file_obj)}")
-        else:
-            # Для обычных полей формы. getlist вернет список, даже если значение одно. Берем первое.
-            if value:
-                data_for_httpx[key] = value[0]
+    # Обрабатываем файлы отдельно, если они есть
+    # Имя поля для файлов от фронтенда должно быть "images"
+    if "images" in form_data_from_frontend:
+        image_uploads = form_data_from_frontend.getlist("images")  # Получаем список UploadFile объектов
+        print(f"Admin Proxy: Found 'images' field with {len(image_uploads)} item(s).")
+        for file_obj in image_uploads:
+            if isinstance(file_obj, UploadFile):
+                content = await file_obj.read()
+                files_to_send_to_httpx.append(("images", (file_obj.filename, content, file_obj.content_type)))
+                await file_obj.close()
+                print(f"Admin Proxy: Prepared file '{file_obj.filename}' for key 'images'")
+            elif isinstance(file_obj, str) and not file_obj:  # Если пришел пустой файл-инпут
+                print(f"Admin Proxy: Empty string received for an 'images' field item, skipping.")
             else:
-                data_for_httpx[key] = ""  # Или None, если Pydantic в ProductService это обработает
+                print(
+                    f"Admin Proxy: Warning - received non-UploadFile or unexpected data for an 'images' field item: {type(file_obj)}")
+    else:
+        print("Admin Proxy: 'images' field not found in form data.")
 
-    print(f"Admin Proxy: Forwarding POST to {target_url}")
-    print(f"Admin Proxy: Data for httpx: {data_for_httpx.keys()}")
-    print(
-        f"Admin Proxy: Files for httpx count: {len(files_for_httpx)} (key: '{files_for_httpx[0][0] if files_for_httpx else 'N/A'}')")
+    # Обрабатываем остальные текстовые поля
+    for key in form_data_from_frontend:
+        if key != "images":  # Пропускаем поле 'images', так как оно уже обработано
+            field_values = form_data_from_frontend.getlist(key)
+            if field_values:
+                data_to_send_to_httpx[key] = field_values[0]  # Берем первое значение
+            else:
+                data_to_send_to_httpx[key] = ""
+
+    print(f"Admin Proxy: Data for httpx after processing: {list(data_to_send_to_httpx.keys())}")
+    print(f"Admin Proxy: Files for httpx count after processing: {len(files_to_send_to_httpx)}")
+    if files_to_send_to_httpx:
+        print(
+            f"Admin Proxy: First file details in files_for_httpx: name='{files_to_send_to_httpx[0][1][0]}', key='{files_to_send_to_httpx[0][0]}'")
+    else:
+        print("Admin Proxy: No files prepared for httpx (after explicit 'images' check).")
 
     async with httpx.AsyncClient() as client:
         try:
-            # Если файлов нет, files_for_httpx будет пустым, httpx отправит только data
-            response = await client.post(target_url, data=data_for_httpx,
-                                         files=files_for_httpx if files_for_httpx else None)
-
-            print(f"Admin Proxy: Received status {response.status_code} from {target_url} after POST")
+            response = await client.post(
+                target_url,
+                data=data_to_send_to_httpx if data_to_send_to_httpx else None,
+                files=files_to_send_to_httpx if files_to_send_to_httpx else None
+            )
+            # ... (остальная обработка ответа и ошибок как была) ...
+            print(
+                f"Admin Proxy: Received status {response.status_code} from {target_url} after POST, Response text: {response.text[:200]}")
             response.raise_for_status()
             return await handle_proxy_response(response)
-        # ... (остальная обработка ошибок как была) ...
         except httpx.HTTPStatusError as e:
             error_detail = "Unknown error from product service."
             try:

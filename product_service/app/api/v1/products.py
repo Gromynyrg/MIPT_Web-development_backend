@@ -21,7 +21,11 @@ async def api_create_product_with_images(
         db: Session = Depends(get_db)
 ):
     product_create_schema = schemas.ProductCreate(**product_form_data.model_dump())
-
+    print(f"Product Service: Received product data: {product_create_schema.model_dump(exclude={'description'})}") # Логируем часть данных
+    if images:
+        print(f"Product Service: Received {len(images)} files. First file: {images[0].filename if images else 'N/A'}")
+    else:
+        print("Product Service: No image files received.")
     try:
         # Вызываем обновленный CRUD, который сам обрабатывает файлы
         db_product = crud.create_product(
