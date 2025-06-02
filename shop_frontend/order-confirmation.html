@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подтверждение заказа - Магазин Лампочек</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Можно подключить checkout.css, если там есть общие стили для секций, или создать новый confirmation.css -->
+    <link rel="stylesheet" href="css/checkout.css"> 
+    <link rel="stylesheet" href="css/order-confirmation.css"> <!-- Специфичные стили для этой страницы -->
+</head>
+<body>
+
+    <header class="header">
+        <div class="container header__container">
+            <a href="index.html" class="header__logo" aria-label="Логотип Магазина Лампочек">
+                <img src="images/logo.svg" alt="Магазин Лампочек">
+            </a>
+            <div class="header__user-actions">
+                <a href="cart.html" class="header__cart-link" aria-label="Корзина">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+                         <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                    </svg>
+                </a>
+                <a href="#" class="header__user-profile" aria-label="Профиль пользователя">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-log-in">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                    <span>Вход</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <h1 class="confirmation-page-title">Подтверждение заказа</h1>
+
+            <section class="confirmation-section">
+                <div class="confirmation-message">
+                    <h2 class="confirmation-message__title">Ваш заказ <span id="order-number">№XXX-XXX-XX</span> успешно сформирован!</h2>
+                    <p>Доставка ожидается <strong id="delivery-date">XX.XX</strong> до <strong id="delivery-time">18:00</strong>.</p>
+                    <p>Срок хранения заказа в пункте выдачи - 7 дней.</p>
+                    <p>После поступления вашего заказа в пункт выдачи вам будет выслано СМС-уведомление.</p>
+                </div>
+
+                <div class="pickup-info-confirmation">
+                    <h3 class="pickup-info-confirmation__title">Пункт для самовывоза:</h3>
+                    <div class="pickup-info-confirmation__details">
+                        <div class="pickup-info-confirmation__address">
+                            <strong>Адрес:</strong>
+                            <p>г. Москва, ул. Трудовая, д. 18</p>
+                        </div>
+                        <div class="pickup-info-confirmation__hours">
+                            <strong>Время работы:</strong>
+                            <p>Пн-Пт: 09:00 - 21:00<br>Сб-Вс: 10:00 - 20:00</p>
+                        </div>
+                    </div>
+                    <div class="pickup-info-confirmation__map-container"> <!-- Контейнер для карты -->
+                        <iframe 
+                            width="100%" 
+                            height="100%" 
+                            frameborder="0" 
+                            scrolling="no" 
+                            marginheight="0" 
+                            marginwidth="0" 
+                            src="https://www.openstreetmap.org/export/embed.html?bbox=37.61223%2C55.74153%2C37.61875%2C55.74411&layer=mapnik&marker=55.74282%2C37.61549" 
+                            style="border: 1px solid var(--color-border-light);">
+                        </iframe>
+                    </div>
+                </div>
+                 <small class="map-attribution">Карта © <a href="https://www.openstreetmap.org/copyright">участники OpenStreetMap</a></small>
+                </div>
+
+                <div class="confirmation-actions">
+                    <a href="index.html" class="button button--accent confirmation-actions__button">Вернуться на главную</a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__container">
+            <nav class="footer__nav" aria-label="Нижняя навигация">
+                <ul class="footer__list">
+                    <li class="footer__item"><a href="index.html" class="footer__link">Главная</a></li>
+                    <li class="footer__item"><a href="cart.html" class="footer__link">Корзина</a></li>
+                    <li class="footer__item"><a href="index.html" class="footer__link">Каталог</a></li>
+                    <li class="footer__item"><a href="contacts.html" class="footer__link">Контакты</a></li>
+                </ul>
+            </nav>
+
+            <div class="footer__brand-info"> <!-- Новый контейнер для лого и копирайта -->
+                <a href="index.html" class="footer__logo" aria-label="На главную - Магазин Лампочек">
+                    <img src="images/logo.svg" alt="Магазин Лампочек">
+                </a>
+                <p class="footer__copyright">(C) 2024-2025, Магазин Лампочек</p>
+            </div>
+
+        </div>
+    </footer>
+
+</body>
+</html>

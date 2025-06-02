@@ -1,0 +1,250 @@
+body.admin-body { /* Чтобы не конфликтовать со стилями login.html, если style.css общий */
+    background-color: #e9ecef; /* Светлый фон для админки */
+    color: #333;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.admin-header {
+    background-color: #4a5568; /* Темно-серый/синий хедер */
+    color: white;
+    padding: 0 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 100%;
+}
+
+.admin-header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+}
+
+.admin-nav .nav-button {
+    background: none;
+    border: none;
+    color: #cbd5e0;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.2s, border-bottom 0.2s;
+    border-bottom: 3px solid transparent;
+}
+
+.admin-nav .nav-button:hover {
+    color: white;
+}
+
+.admin-nav .nav-button.active {
+    color: white;
+    font-weight: 600;
+    border-bottom: 3px solid #f8941d; /* Оранжевый акцент */
+}
+
+.admin-user-info {
+    display: flex;
+    align-items: center;
+}
+
+.admin-user-info #adminUsername {
+    margin-right: 15px;
+}
+
+.btn-exit {
+    background-color: #f8941d; /* Оранжевый */
+    color: white;
+    padding: 8px 15px;
+    font-size: 14px;
+}
+.btn-exit:hover {
+    background-color: #e0800f;
+}
+
+.admin-main-content {
+    flex-grow: 1;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
+    width: calc(100% - 40px);
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.content-section {
+    display: none; /* Скрыты по умолчанию */
+}
+.content-section.active {
+    display: block; /* Показываем активную секцию */
+}
+
+.content-section h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 500;
+    color: #444;
+}
+
+.actions-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.actions-bar input[type="text"],
+.actions-bar select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 15px;
+    flex-grow: 1;
+    min-width: 200px;
+}
+
+.btn-action {
+    background-color: #e0800f; /* Оранжевый для действий */
+    color: white;
+    padding: 10px 20px;
+}
+.btn-action:hover {
+    background-color: #c0700d;
+}
+
+
+/* Стили для таблиц (очень базовые) */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 0.95em;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: middle;
+}
+th {
+    background-color: #f2f2f2;
+    font-weight: 600;
+}
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+td .btn-table-action {
+    padding: 5px 10px;
+    font-size: 0.9em;
+    margin-right: 5px;
+    background-color: #6c757d;
+    color: white;
+}
+td .btn-table-action.delete {
+    background-color: #dc3545;
+}
+td .btn-table-action:hover {
+    opacity: 0.8;
+}
+
+.pagination {
+    text-align: center;
+    margin-top: 20px;
+}
+.pagination button, .pagination span {
+    margin: 0 5px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background-color: white;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.pagination button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+.pagination span.current-page {
+    font-weight: bold;
+    background-color: #f0f0f0;
+}
+
+/* Стили для модальных окон (попапов) */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5); /* Полупрозрачный фон */
+    display: flex; /* Используем flex для центрирования */
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: auto; /* Для центрирования, если не flex */
+    padding: 25px 30px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px; /* Ширина для попапа товара */
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative;
+    max-height: 90vh; /* Ограничение высоты */
+    overflow-y: auto; /* Прокрутка, если контент не влезает */
+}
+.modal-content.large {
+    max-width: 800px; /* Ширина для попапа заказа */
+}
+
+.close-button {
+    color: #aaa;
+    float: right; /* Старый способ, но работает */
+    position: absolute; /* Или так для лучшего контроля */
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.modal .form-group {
+    margin-bottom: 15px;
+}
+.modal .form-group label {
+    font-size: 0.95em;
+}
+
+.images-preview img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: inline-block;
+}
+.images-preview .delete-img-btn {
+    font-size: 10px;
+    padding: 2px 4px;
+    vertical-align: top;
+}

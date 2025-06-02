@@ -92,3 +92,11 @@ class OrderInList(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class OrderListResponse(BaseModel):
+    items: List[OrderInList]
+    total_count: int
+    page: Optional[int] = None
+    limit: Optional[int] = None
+    pages: Optional[int] = None

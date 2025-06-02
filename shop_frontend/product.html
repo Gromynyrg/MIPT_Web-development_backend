@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Загрузка товара... - Магазин Лампочек</title> <!-- Временный title -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/product.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="container header__container">
+            <a href="index.html" class="header__logo" aria-label="Логотип Магазина Лампочек">
+                <img src="images/logo.svg" alt="Магазин Лампочек">
+            </a>
+            <div class="header__user-actions">
+                <a href="cart.html" class="header__cart-link" aria-label="Корзина">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+                         <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                    </svg>
+                </a>
+                <a href="#" class="header__user-profile" aria-label="Профиль пользователя">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-log-in">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                    <span>Вход</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content main-content--product">
+        <div class="container">
+
+            <nav class="breadcrumbs" aria-label="Хлебные крошки">
+                <ol class="breadcrumbs__list">
+                    <li class="breadcrumbs__item">
+                        <a href="./index.html" class="breadcrumbs__link">Каталог</a>
+                    </li>
+                    <li class="breadcrumbs__item" aria-current="page">
+                        <!-- Название товара будет вставлено JS -->
+                        Загрузка...
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="product-main">
+                <section class="product-gallery" aria-label="Галерея изображений товара">
+                    <div class="product-gallery__main-image">
+                        <!-- Главное изображение будет установлено JS -->
+                        <img src="https://placehold.co/600x600/e9ecef/adb5bd?text=Loading..." alt="Загрузка изображения товара" id="main-product-image">
+                        <button class="product-gallery__arrow product-gallery__arrow--prev" aria-label="Предыдущее изображение" type="button"><</button>
+                        <button class="product-gallery__arrow product-gallery__arrow--next" aria-label="Следующее изображение" type="button">></button>
+                    </div>
+                    <div class="product-gallery__thumbnails">
+                        <!-- Миниатюры будут сгенерированы JS -->
+                    </div>
+                </section>
+
+                <aside class="product-details">
+                     <h1 class="product-title">
+                         <!-- Название товара будет вставлено JS -->
+                         Загрузка названия...
+                     </h1>
+                     <div class="product-purchase-block">
+                        <p class="product-purchase-block__price">
+                            <!-- Цена будет вставлена JS -->
+                            -- ₽
+                        </p>
+                        <div class="quantity-selector">
+                            <button type="button" class="quantity-selector__button quantity-selector__button--decrease" aria-label="Уменьшить количество">-</button>
+                            <input type="number" class="quantity-selector__input" value="1" min="1" max="99" aria-label="Количество товара" inputmode="numeric">
+                            <button type="button" class="quantity-selector__button quantity-selector__button--increase" aria-label="Увеличить количество">+</button>
+                        </div>
+                        <button type="button" class="button product-purchase-block__button button--accent">
+                            Добавить в корзину
+                        </button>
+                    </div>
+
+                    <div class="product-characteristics">
+                        <h2 class="product-characteristics__title">Характеристики:</h2>
+                        <ul class="product-characteristics__list">
+                            <!-- Характеристики будут добавлены JS -->
+                            <li>Загрузка характеристик...</li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+
+            <section class="product-description" aria-labelledby="product-description-title">
+                <!-- Описание будет вставлено JS -->
+                <h2 id="product-description-title" class="product-description__title">Описание товара</h2>
+                <p>Загрузка описания...</p>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__container">
+            <nav class="footer__nav" aria-label="Нижняя навигация">
+                <ul class="footer__list">
+                    <li class="footer__item"><a href="index.html" class="footer__link">Главная</a></li>
+                    <li class="footer__item"><a href="cart.html" class="footer__link">Корзина</a></li>
+                    <li class="footer__item"><a href="index.html" class="footer__link">Каталог</a></li>
+                    <li class="footer__item"><a href="contacts.html" class="footer__link">Контакты</a></li>
+                </ul>
+            </nav>
+
+            <div class="footer__brand-info"> <!-- Новый контейнер для лого и копирайта -->
+                <a href="index.html" class="footer__logo" aria-label="На главную - Магазин Лампочек">
+                    <img src="images/logo.svg" alt="Магазин Лампочек">
+                </a>
+                <p class="footer__copyright">(C) 2024-2025, Магазин Лампочек</p>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- Подключаем скрипты в конце body -->
+    <script src="js/config_client.js"></script>
+    <script src="js/api_client.js"></script>
+    <script src="js/cart-logic.js"></script>
+    <!-- main.js содержит универсальные обработчики (например, для quantity-selector) и галерею -->
+    <script src="js/main.js"></script>
+    <script src="js/product-page.js"></script>
+</body>
+</html>

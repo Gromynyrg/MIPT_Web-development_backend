@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import uvicorn
 
@@ -23,6 +24,22 @@ app = FastAPI(
     description="Микросервис для управления заказами и промокодами.",
     version="0.1.0",
     lifespan=lifespan
+)
+
+client_origins = [
+    "http://localhost",         # Общий для разработки
+    "http://127.0.0.1",       # Общий для разработки
+    "null",                     # Для file:///
+    "http://127.0.0.1:5501",
+    "http://localhost:5501",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=client_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Подключаем роутеры API

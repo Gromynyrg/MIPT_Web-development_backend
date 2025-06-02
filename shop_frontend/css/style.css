@@ -1,0 +1,582 @@
+/* ----- Базовый сброс и настройки ----- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ----- CSS Переменные (для удобства темизации) ----- */
+:root {
+    --color-primary: #f8941d; /* Основной оранжевый */
+    --color-primary-dark: #e0800f; /* Темнее оранжевый для hover */
+    --color-secondary: #6c757d; /* Серый для футера/вторичных элементов */
+    --color-secondary-light: #adb5bd;
+    --color-background: #f8f9fa; /* Светлый фон основной */
+    --color-background-card: #ffffff; /* Фон карточек */
+    --color-text: #343a40; /* Основной текст */
+    --color-text-light: #6c757d;
+    --color-text-on-primary: #ffffff; /* Текст на оранжевом фоне */
+    --color-text-on-secondary: #e9ecef;
+    --color-border: #dee2e6;
+    --color-placeholder-bg: #e9ecef;
+    --color-placeholder-border: #adb5bd;
+    --color-primary-rgb: 248, 148, 29; /* Замените на RGB вашего основного оранжевого цвета */
+    --header-height: 60px; /* Или реальная высота вашего хедера, если он фиксированный */
+
+    --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    --line-height-base: 1.6;
+    --border-radius: 6px;
+    --container-max-width: 1200px;
+    --container-padding: 15px;
+    --grid-gap: 25px;
+    --transition-speed: 0.2s;
+}
+
+/* ----- Глобальные стили ----- */
+html {
+    scroll-behavior: smooth; /* Плавная прокрутка по якорям */
+    font-size: 16px; /* Базовый размер шрифта */
+}
+
+body {
+    font-family: var(--font-family-base);
+    line-height: var(--line-height-base);
+    color: var(--color-text);
+    background-color: var(--color-background);
+    display: flex; /* Прижимаем футер к низу */
+    flex-direction: column; /* Прижимаем футер к низу */
+    min-height: 100vh; /* Прижимаем футер к низу */
+}
+
+main {
+    flex-grow: 1; /* Занимает доступное пространство, прижимая футер */
+}
+
+
+a {
+    text-decoration: none;
+    color: var(--color-primary); /* Ссылки по умолчанию оранжевые */
+    transition: color var(--transition-speed) ease;
+}
+
+a:hover {
+    color: var(--color-primary-dark);
+    text-decoration: underline; /* Подчеркивание при наведении для ясности */
+}
+
+ul {
+    list-style: none;
+}
+
+button {
+    font: inherit;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    padding: 0; /* Убираем лишние паддинги */
+}
+
+img { /* Для реальных изображений */
+    max-width: 100%;
+    height: auto; /* Сохраняем пропорции */
+    display: block;
+    object-fit: cover; /* Как изображение должно заполнять контейнер */
+}
+
+/* ----- Утилиты ----- */
+.container {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    padding: 0 var(--container-padding);
+    width: 100%; /* Чтобы padding работал правильно */
+}
+
+/* Скрывает элемент визуально, но оставляет доступным для скринридеров */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  border: 0 !important;
+  padding: 0 !important;
+  white-space: nowrap !important;
+  clip-path: inset(100%) !important;
+  clip: rect(0 0 0 0) !important;
+  overflow: hidden !important;
+}
+
+/* Улучшенные стили фокуса для доступности */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 2px; /* Слегка скруглим контур */
+}
+/* Убираем стандартный outline, когда используется focus-visible */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+
+/* ----- Плейсхолдеры (для визуализации макета) ----- */
+.placeholder {
+    background-color: var(--color-placeholder-bg);
+    border: 1px dashed var(--color-placeholder-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-light);
+    font-size: 0.9em;
+    /* Убрали крестик для чистоты, можно вернуть при необходимости */
+    /* position: relative; */
+}
+/* Убрали крестик */
+/* .placeholder::before,
+.placeholder::after { ... } */
+
+.placeholder--small { height: 40px; min-width: 100px; }
+.placeholder--icon { height: 30px; width: 30px; border-radius: var(--border-radius); }
+.placeholder--user { height: 30px; padding: 0 10px; border-radius: var(--border-radius);}
+.placeholder--image { width: 100%; aspect-ratio: 1 / 1; margin-bottom: 15px; }
+.placeholder--medium { height: 60px; min-width: 150px; }
+
+
+/* ----- Стили кнопок ----- */
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    background-color: var(--color-primary); /* Основной цвет кнопки (оранжевый) */
+    color: var(--color-text-on-primary);
+    text-align: center;
+    font-weight: 600;
+    transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease;
+    border: 1px solid transparent; /* Для согласованности с focus */
+}
+
+.button:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-1px); /* Небольшой подъем при наведении */
+    text-decoration: none; /* Убираем подчеркивание у кнопок */
+}
+
+.button:active {
+     transform: translateY(0); /* Возврат при нажатии */
+}
+
+.button--secondary {
+    background-color: var(--color-placeholder-bg);
+    color: var(--color-text-light);
+    border-color: var(--color-border);
+}
+
+.button--secondary:hover {
+    background-color: var(--color-border);
+    color: var(--color-text);
+}
+
+/* ----- Header ----- */
+.header {
+    background-color: var(--color-primary);
+    padding: 10px 0;
+    color: var(--color-text-on-primary);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Небольшая тень */
+    position: sticky; /* Прилипание хедера */
+    top: 0;
+    z-index: 100; /* Чтобы был поверх контента при скролле */
+}
+
+.header__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px; /* Расстояние между лого и блоком пользователя */
+}
+
+.header__logo {
+    border-color: var(--color-text-on-primary);
+    flex-shrink: 0; /* Предотвращает сжатие логотипа */
+}
+.header__logo:hover { text-decoration: none; }
+
+.header__logo img {
+    display: block; /* Убирает лишние отступы под изображением, если оно inline */
+    height: 45px;   /* Задайте желаемую высоту логотипа */
+    width: auto;    /* Ширина будет подстраиваться автоматически, сохраняя пропорции */
+    max-width: 150px;
+}
+
+/* Если вы хотите, чтобы логотип-ссылка занимал только место под логотип: */
+.header__logo {
+    display: inline-block; /* или block, в зависимости от поведения */
+    line-height: 0; /* Помогает убрать лишние отступы, если картинка внутри ссылки */
+}
+
+
+.header__user-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Расстояние между иконками */
+}
+
+.header__cart-link, .header__user-profile {
+    position: relative; /* Для позиционирования значка-количества */
+    display: inline-flex; /* Чтобы SVG и значок были в потоке */
+    align-items: center;
+    justify-content: center;
+    padding: 8px; /* Небольшой отступ вокруг иконки */
+    color: var(--color-text-on-primary); /* Цвет иконки (белый на оранжевом фоне) */
+    border-radius: var(--border-radius);
+    transition: background-color var(--transition-speed) ease;
+}
+.header__cart-link:hover, .header__user-profile:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    text-decoration: none;
+}
+.header__cart-link svg {
+    width: 22px;  /* Размер SVG иконки */
+    height: 22px;
+    stroke: currentColor; /* Чтобы цвет наследовался от ссылки */
+}
+
+/* ----- Main Content Area ----- */
+.main-content {
+    padding: 30px 0;
+}
+
+.main-content__container {
+    display: flex;
+    gap: var(--grid-gap); /* Расстояние между сайдбаром и каталогом */
+}
+
+/* ----- Sidebar ----- */
+.sidebar {
+    flex: 0 0 240px; /* Немного шире и все еще фиксировано на больших экранах */
+    /* Убираем стили фона/паддингов, если не нужны явно */
+}
+
+.sidebar__title {
+    font-size: 1.4em;
+    margin-bottom: 20px;
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 10px;
+}
+
+.sidebar__filter-list {
+    /* padding-left: 15px; Убираем, если не нужно */
+}
+
+.sidebar__filter-item {
+    margin-bottom: 10px;
+}
+
+.sidebar__filter-link {
+    color: var(--color-text-light);
+    transition: color var(--transition-speed) ease;
+    font-weight: 500;
+    display: block; /* Чтобы занимала всю ширину для клика */
+    padding: 5px 0;
+}
+
+.sidebar__filter-link:hover,
+.sidebar__filter-link:focus-visible { /* Выделяем оранжевым при наведении/фокусе */
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+/* ----- Catalog ----- */
+.catalog {
+    flex: 1; /* Занимает оставшееся пространство */
+    min-width: 0; /* Предотвращает выход контента за пределы flex-элемента */
+}
+
+/* ----- Product Grid ----- */
+.product-grid {
+    display: grid;
+    /* Более гибкая сетка для маленьких экранов */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--grid-gap);
+    margin-bottom: 30px;
+}
+
+/* ----- Product Card ----- */
+.product-card {
+    background-color: var(--color-background-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: 15px; /* Уменьшим паддинг для компактности */
+    text-align: left; /* Текст влево */
+    transition: box-shadow var(--transition-speed) ease, transform var(--transition-speed) ease;
+    display: flex;
+    flex-direction: column;
+    position: relative; /* Для возможных будущих элементов (лейблы и т.д.) */
+}
+
+.product-card:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-3px);
+}
+
+.product-card__link {
+    /* Ссылка больше не оборачивает цену/кнопку */
+    display: block; /* или flex если нужно выравнивание внутри ссылки */
+    color: var(--color-text); /* Ссылки в карточке черные по умолчанию */
+    margin-bottom: 15px; /* Отступ до блока с ценой/кнопкой */
+}
+.product-card__link:hover {
+    text-decoration: none; /* Не подчеркиваем заголовок при наведении на карточку */
+}
+.product-card__link:hover .product-card__title {
+    color: var(--color-primary); /* Заголовок становится оранжевым при наведении */
+}
+
+.product-card__image {
+    margin-bottom: 15px;
+    border-radius: calc(var(--border-radius) - 2px); /* Скругление картинки */
+    overflow: hidden; /* Обрезать выходящее за рамки изображение */
+}
+
+.product-card__title {
+    font-size: 1em; /* Можно чуть увеличить 1.1em */
+    font-weight: 600;
+    margin-bottom: 8px; /* Отступ снизу у заголовка */
+    color: var(--color-text);
+    transition: color var(--transition-speed) ease;
+    /* Ограничение текста */
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Максимум 2 строки */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: calc(1em * var(--line-height-base) * 2); /* Резервируем место под 2 строки */
+}
+
+.product-card__footer {
+    margin-top: auto; /* Прижимает этот блок к низу карточки */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px; /* Расстояние между ценой и кнопкой */
+    padding-top: 10px; /* Небольшой отступ сверху, если нужно */
+    border-top: 1px solid var(--color-border); /* Разделитель */
+}
+
+.product-card__price {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0; /* Убираем лишние отступы */
+    white-space: nowrap; /* Предотвращаем перенос цены */
+}
+
+.product-card__button {
+    padding: 8px 12px; /* Кнопка поменьше */
+    font-size: 0.9em;
+    flex-shrink: 0; /* Не сжимать кнопку */
+}
+
+/* ----- Load More Button ----- */
+.load-more-button {
+    display: block;
+    margin: 20px auto 0; /* Центрирование кнопки, отступ сверху */
+}
+
+/* ----- Footer ----- */
+.footer {
+    background-color: var(--color-secondary);
+    color: var(--color-text-on-secondary);
+    padding: 30px 0;
+    margin-top: 40px; /* Отступ сверху */
+    font-size: 0.9em;
+}
+
+.footer__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Перенос на маленьких экранах */
+    gap: 20px;
+}
+
+.footer__nav {
+    /* flex-grow: 1; Убрали, чтобы не растягивал */
+    order: 1; /* Сначала навигация на мобильных */
+}
+
+.footer__list {
+    display: flex;
+    gap: 15px 25px; /* Отступы по вертикали и горизонтали при переносе */
+    flex-wrap: wrap;
+}
+
+.footer__link {
+    color: var(--color-secondary-light);
+    transition: color var(--transition-speed) ease;
+}
+
+.footer__link:hover {
+    color: var(--color-text-on-primary); /* Белый при наведении */
+    text-decoration: none;
+}
+
+.footer__copyright {
+    color: var(--color-secondary-light);
+    text-align: center; /* Центрируем текст копирайта */
+    flex-basis: 100%; /* На маленьких экранах занимает всю ширину */
+    order: 3; /* Копирайт последним на мобильных */
+    margin-top: 10px; /* Отступ сверху на мобильных */
+}
+
+.footer__social { /* Плейсхолдер соцсетей */
+    border-color: var(--color-secondary-light);
+    background-color: var(--color-text-light);
+    order: 2; /* Между навигацией и копирайтом на мобильных */
+}
+.footer__social::before, .footer__social::after { background-color: var(--color-secondary-light); }
+
+.footer__logo img {
+    height: 35px; /* Меньше, чем в хедере, или как тебе нравится */
+    width: auto;
+    opacity: 0.8; /* Немного приглушенный */
+    transition: opacity var(--transition-speed) ease;
+}
+
+.footer__logo:hover img {
+    opacity: 1;
+}
+
+/* ----- Адаптивность ----- */
+
+/* Планшеты и десктопы (когда есть место для сайдбара) */
+@media (min-width: 768px) {
+    .main-content__container {
+        /* Возвращаем flex-row по умолчанию */
+        flex-direction: row;
+    }
+
+     .sidebar {
+        /* Возвращаем фиксированную ширину */
+         flex: 0 0 240px;
+         margin-bottom: 0; /* Убираем нижний отступ */
+    }
+
+    .footer__container {
+         /* Выравниваем элементы футера по линии */
+         align-items: center;
+     }
+
+     .footer__nav {
+        order: 0; /* Нормальный порядок */
+     }
+     .footer__social {
+         order: 0; /* Нормальный порядок */
+         margin-left: auto; /* Отодвигаем вправо */
+     }
+
+     .footer__copyright {
+        flex-basis: auto; /* Возвращаем автоширину */
+        order: 0; /* Возвращаем нормальный порядок */
+        text-align: left;
+        margin-top: 0;
+     }
+}
+
+/* Очень маленькие экраны */
+@media (max-width: 480px) {
+    :root {
+        --grid-gap: 15px; /* Уменьшаем отступы */
+        --container-padding: 10px;
+    }
+
+    .header__container {
+        gap: 10px;
+    }
+    .header__logo.placeholder--small {
+        min-width: 80px; /* Чуть меньше лого */
+        height: 35px;
+    }
+    .header__user-actions {
+        gap: 10px;
+    }
+
+    .product-grid {
+         /* Можно сделать 2 колонки явно */
+         grid-template-columns: repeat(2, 1fr);
+         /* Или оставить auto-fill с меньшим minmax */
+         /* grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); */
+         gap: 15px;
+    }
+    .product-card {
+        padding: 10px;
+    }
+    .product-card__footer {
+        flex-direction: column; /* Цена и кнопка друг под другом */
+        align-items: flex-start; /* Выравнивание по левому краю */
+        gap: 8px;
+        border-top: none; /* Убрать разделитель */
+        padding-top: 5px;
+    }
+    .product-card__price {
+        font-size: 1.1em;
+    }
+    .product-card__button {
+        width: 100%; /* Кнопка на всю ширину */
+    }
+
+    .footer__list {
+        gap: 10px 15px;
+        justify-content: center; /* Центрируем ссылки */
+    }
+     .footer__social {
+         margin: 0 auto; /* Центрируем блок соцсетей */
+     }
+}
+
+/* Стили для мобильных устройств (до 767px включительно) */
+@media (max-width: 767px) {
+    .main-content__container {
+        flex-direction: column; /* Сайдбар над каталогом */
+        gap: 25px;
+    }
+
+    .sidebar {
+        flex-basis: auto; /* Автоматическая ширина (100%) */
+        width: 100%;
+        margin-bottom: 20px; /* Отступ под сайдбаром */
+    }
+     .sidebar__title {
+         margin-bottom: 15px;
+     }
+
+}
+
+.sidebar__filter-link.active-filter {
+    font-weight: bold;
+    color: var(--color-primary); /* Оранжевый цвет для активного фильтра */
+    text-decoration: underline;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -5px; /* Настройте позицию */
+    right: -8px; /* Настройте позицию */
+    background-color: var(--color-accent-red, red); /* Или другой цвет для значка */
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.75em; /* Меньший размер шрифта */
+    font-weight: bold;
+    line-height: 1;
+    min-width: 18px; /* Чтобы кружок был круглым даже с одной цифрой */
+    min-height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}

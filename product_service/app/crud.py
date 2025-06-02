@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func as sqlalchemy_func
 from typing import List, Optional
 import uuid
 import os
@@ -42,8 +43,32 @@ def get_product_by_name(db: Session, name: str) -> Optional[models.Product]:
     return db.query(models.Product).filter(models.Product.name == name).first()
 
 
-def get_all_products(db: Session, skip: int = 0, limit: int = 20) -> List[models.Product]:
-    return db.query(models.Product).offset(skip).limit(limit).all()
+def get_all_products(
+        db: Session,
+        skip: int = 0,
+        limit: int = 20,
+        search_term: Optional[str] = None,
+        technology: Optional[models.LampTechnologyEnum] = None
+) -> tuple[List[models.Product], int]:  # Возвращаем кортеж: (список_товаров, общее_количество)
+
+    query = db.query(models.Product)
+
+    if search_term:
+        # Простой поиск по имени и артикулу
+        search_filter = f"%{search_term.lower()}%"
+        query = query.filter(
+            (sqlalchemy_func.lower(models.Product.name).ilike(search_filter)) |
+            (sqlalchemy_func.lower(models.Product.article).ilike(search_filter))
+        )
+
+    if technology:
+        query = query.filter(models.Product.product_technology == technology)
+
+    total_count = query.count()  # Получаем общее количество до применения offset/limit
+
+    products = query.order_by(models.Product.created_at.desc()).offset(skip).limit(limit).all()
+
+    return products, total_count
 
 
 def create_product(db: Session, product_data: schemas.ProductCreate,

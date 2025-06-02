@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query, File, Uplo
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import uuid
+from math import ceil
 
 from app import crud, models, schemas
 from app.db import get_db
@@ -41,19 +42,34 @@ async def api_create_product_with_images(
     return db_product
 
 
-@router.get("/", response_model=List[schemas.ProductInList])
+@router.get("/", response_model=schemas.ProductListResponse)  # Используем новую схему ответа
 def api_read_products(
-        skip: int = Query(0, ge=0), limit: int = Query(20, ge=1, le=100), db: Session = Depends(get_db)
+        skip: int = Query(0, ge=0, description="Количество пропускаемых записей"),
+        limit: int = Query(20, ge=1, le=100, description="Максимальное количество записей"),
+        search: Optional[str] = Query(None, description="Строка для поиска по названию или артикулу"),  # Для поиска
+        technology: Optional[models.LampTechnologyEnum] = Query(None, description="Фильтр по технологии лампы (например, Светодиодная, Накаливания)"),
+        db: Session = Depends(get_db)
 ):
-    products = crud.get_all_products(db, skip=skip, limit=limit)
-    results = []
-    for p in products:
+    products_models, total_count = crud.get_all_products(db, skip=skip, limit=limit, search_term=search, technology=technology)
+
+    items_response = []
+    for p in products_models:
         main_image_url = p.images[0].image_url if p.images else None
-        results.append(schemas.ProductInList(
+        items_response.append(schemas.ProductInList(
             product_id=p.product_id, name=p.name, article=p.article,
             price=p.price, main_image_url=main_image_url
         ))
-    return results
+
+    current_page = (skip // limit) + 1 if limit > 0 else 1
+    total_pages = ceil(total_count / limit) if limit > 0 else 1
+
+    return schemas.ProductListResponse(
+        items=items_response,
+        total_count=total_count,
+        page=current_page,
+        limit=limit,
+        pages=total_pages
+    )
 
 
 @router.get("/{product_id}", response_model=schemas.Product)

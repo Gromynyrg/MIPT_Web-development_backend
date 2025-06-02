@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная страница - Магазин Лампочек</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="container header__container">
+            <a href="index.html" class="header__logo" aria-label="Логотип Магазина Лампочек">
+                <img src="images/logo.svg" alt="Магазин Лампочек">
+            </a>
+            <div class="header__user-actions">
+                <a href="cart.html" class="header__cart-link" aria-label="Корзина">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+                         <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                    </svg>
+                </a>
+                <a href="../admin_frontend/login.html" class="header__user-profile" aria-label="Профиль пользователя">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-log-in">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                    <span>Вход</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container main-content__container">
+            <h1 class="visually-hidden">Каталог лампочек</h1>
+
+            <aside class="sidebar">
+                <h2 class="sidebar__title">Лампы</h2>
+                <nav aria-labelledby="filter-title">
+                     <h3 id="filter-title" class="visually-hidden">Фильтры каталога</h3>
+                     <ul class="sidebar__filter-list">
+                        <li class="sidebar__filter-item">
+                            <a href="#" class="sidebar__filter-link" data-filter-type="technology" data-filter-value="Светодиодная">Светодиодные</a>
+                        </li>
+                        <li class="sidebar__filter-item">
+                            <a href="#" class="sidebar__filter-link" data-filter-type="technology" data-filter-value="Накаливания">Накаливания</a>
+                        </li>
+                        <li class="sidebar__filter-item">
+                            <a href="#" class="sidebar__filter-link" data-filter-type="technology" data-filter-value="Галогенная">Галогенные</a>
+                        </li>
+                        <li class="sidebar__filter-item">
+                            <a href="#" class="sidebar__filter-link" data-filter-type="technology" data-filter-value="Люминесцентная">Люминесцентная</a>
+                        </li>
+                        <li class="sidebar__filter-item">
+                            <a href="#" class="sidebar__filter-link" data-filter-type="technology" data-filter-value="Другая">Другие</a>
+                        </li>
+                        <li class="sidebar__filter-item" style="margin-top: 10px;"> <!-- Отступ для кнопки сброса -->
+                            <a href="#" class="sidebar__filter-link" id="resetFiltersLink">Сбросить все фильтры</a>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <section class="catalog" aria-labelledby="catalog-title">
+                 <h2 id="catalog-title" class="visually-hidden">Товары</h2>
+                 <div class="product-grid">
+                    <!-- СЮДА JAVASCRIPT БУДЕТ ВСТАВЛЯТЬ КАРТОЧКИ ТОВАРОВ -->
+                    <!-- ПУСТО ИЛИ ВРЕМЕННАЯ ЗАГЛУШКА "Загрузка товаров..." -->
+                 </div>
+
+                <button type="button" class="button button--secondary load-more-button">Загрузить ещё</button>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__container">
+            <nav class="footer__nav" aria-label="Нижняя навигация">
+                <ul class="footer__list">
+                    <li class="footer__item"><a href="index.html" class="footer__link">Главная</a></li>
+                    <li class="footer__item"><a href="cart.html" class="footer__link">Корзина</a></li>
+                    <li class="footer__item"><a href="index.html" class="footer__link">Каталог</a></li>
+                    <li class="footer__item"><a href="contacts.html" class="footer__link">Контакты</a></li>
+                </ul>
+            </nav>
+
+            <div class="footer__brand-info"> <!-- Новый контейнер для лого и копирайта -->
+                <a href="index.html" class="footer__logo" aria-label="На главную - Магазин Лампочек">
+                    <img src="images/logo.svg" alt="Магазин Лампочек">
+                </a>
+                <p class="footer__copyright">(C) 2024-2025, Магазин Лампочек</p>
+            </div>
+
+        </div>
+    </footer>
+    <script src="js/config_client.js"></script>
+    <script src="js/api_client.js"></script>
+    <script src="js/cart-logic.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

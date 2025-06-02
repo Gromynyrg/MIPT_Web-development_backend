@@ -1,0 +1,431 @@
+:root {
+    --color-accent-red: #dc3545; /* Пример красного для кнопки */
+    --color-accent-red-dark: #c82333;
+    --color-purchase-bg: #f1f3f5; /* Светло-серый фон блока покупки */
+    --color-border-light: #e9ecef;
+}
+
+/* ----- Стили для страницы товара (product.html) ----- */
+
+/* Отступы для страницы товара */
+.main-content--product {
+    padding-top: 20px;
+    padding-bottom: 40px;
+}
+
+/* ----- Breadcrumbs ----- */
+.breadcrumbs {
+    margin-bottom: 20px;
+    font-size: 0.9em;
+    color: var(--color-text-light);
+}
+
+.breadcrumbs__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 8px;
+}
+
+.breadcrumbs__item {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumbs__item:not(:last-child)::after {
+    content: ">";
+    margin-left: 8px;
+    color: var(--color-secondary-light);
+    display: inline-block;
+}
+
+.breadcrumbs__link {
+    color: var(--color-text-light);
+    text-decoration: none;
+    transition: color var(--transition-speed) ease;
+}
+
+.breadcrumbs__link:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+.breadcrumbs__item[aria-current="page"] {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+/* ----- Product Title ----- */
+.product-title {
+    font-size: 2.2em;
+    font-weight: 700;
+    margin-bottom: 30px; /* Увеличено для лучшего разделения, если заголовок над деталями */
+    color: var(--color-text);
+    line-height: 1.3;
+}
+
+/* ----- Product Main Layout (Gallery + Details) ----- */
+.product-main { /* Бывший .product-layout, теперь соответствует CSS */
+    display: flex;
+    flex-direction: column; /* Mobile first: stack gallery and details */
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+/* ----- Product Gallery ----- */
+.product-gallery {
+    flex: 1;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto; /* Center gallery if max-width is applied */
+    position: relative;
+}
+
+.product-gallery__main-image {
+    position: relative;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    border: 1px solid var(--color-border-light);
+    background-color: var(--color-background-card);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px; /* Ensure some height, adjust as needed */
+    aspect-ratio: 1 / 1; /* Maintain square aspect ratio for the container */
+}
+
+#main-product-image {
+    display: block;
+    max-width: 100%;
+    max-height: 100%; /* Fill the aspect-ratio container */
+    width: auto;   /* Allow image to scale width based on height or vice-versa */
+    height: auto;  /* Allow image to scale height based on width or vice-versa */
+    object-fit: contain;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.product-gallery__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    color: var(--color-text-light);
+    line-height: 1; /* Fix potential line-height issues with text symbols */
+}
+
+.product-gallery__arrow:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: var(--color-text);
+}
+
+.product-gallery__arrow--prev {
+    left: 10px;
+}
+
+.product-gallery__arrow--next {
+    right: 10px;
+}
+
+.product-gallery__thumbnails {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.product-gallery__thumb {
+    cursor: pointer;
+    border: 2px solid transparent;
+    padding: 2px;
+    background: none;
+    border-radius: calc(var(--border-radius) + 2px);
+    transition: border-color var(--transition-speed) ease;
+    line-height: 0;
+    width: 64px; /* Container size for 60px image + 2px padding + 2px border */
+    height: 64px;
+    box-sizing: content-box; /* Padding and border are outside width/height */
+}
+
+.product-gallery__thumb img {
+    display: block;
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: var(--border-radius);
+    background-color: var(--color-background-card);
+    /* border: 1px solid var(--color-border-light); */ /* Optional border for thumb images */
+}
+
+.product-gallery__thumb:hover {
+    border-color: var(--color-secondary-light);
+}
+
+.product-gallery__thumb.active {
+    border-color: var(--color-primary);
+}
+
+
+/* ----- Product Details (Right Column) ----- */
+.product-details {
+    flex: 1 1 40%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+/* The H1 product-title is now inside product-details in HTML,
+   so its margin-bottom will create space before the purchase block */
+
+/* ----- Purchase Block ----- */
+.product-purchase-block {
+    background-color: var(--color-purchase-bg);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.product-purchase-block__price {
+    font-size: 2em;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+    text-align: center;
+}
+
+/* ----- Quantity Selector ----- */
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quantity-selector__button {
+    width: 35px;
+    height: 35px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-background-card);
+    color: var(--color-text-light);
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quantity-selector__button:hover {
+    background-color: var(--color-border-light);
+    color: var(--color-text);
+}
+
+.quantity-selector__button--decrease {
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+}
+
+.quantity-selector__button--increase {
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+
+.quantity-selector__input {
+    width: 50px;
+    height: 35px;
+    border: 1px solid var(--color-border);
+    border-left: none;
+    border-right: none;
+    text-align: center;
+    font-size: 1em;
+    font-weight: 600;
+    -moz-appearance: textfield;
+}
+.quantity-selector__input::-webkit-outer-spin-button,
+.quantity-selector__input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.product-purchase-block__button {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 1.1em;
+}
+
+.button--accent {
+    background-color: var(--color-accent-red);
+    color: var(--color-text-on-primary);
+}
+
+.button--accent:hover {
+    background-color: var(--color-accent-red-dark);
+}
+
+/* ----- Product Characteristics ----- */
+.product-characteristics {
+   /* Стили по умолчанию нормальные */
+}
+
+.product-characteristics__title {
+    font-size: 1.3em;
+    margin-bottom: 15px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 8px;
+}
+
+.product-characteristics__list {
+    font-size: 0.95em;
+    line-height: 1.7;
+    color: var(--color-text-light);
+}
+
+.product-characteristics__item strong {
+    color: var(--color-text);
+    margin-right: 5px;
+}
+
+/* ----- Product Description ----- */
+.product-description {
+    margin-top: 30px;
+    line-height: 1.7;
+    color: var(--color-text);
+}
+
+.product-description__title {
+    font-size: 1.6em;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.product-description h3 {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+.product-description p {
+    margin-bottom: 15px;
+}
+
+.product-description ul {
+    list-style-type: disc;
+    padding-left: 25px;
+    margin-bottom: 15px;
+}
+.product-description li {
+    margin-bottom: 8px;
+}
+
+/* ----- Адаптивность для страницы товара ----- */
+
+@media (min-width: 768px) { /* Apply for tablets and wider */
+    .product-main {
+        flex-direction: row; /* Gallery and details side-by-side */
+        gap: var(--grid-gap, 30px);
+    }
+    .product-gallery {
+        flex: 0 0 55%; /* Gallery takes more space, adjust as needed */
+        max-width: none; /* Remove max-width when in flex row */
+    }
+    .product-details {
+        flex: 1 1 45%; /* Details take remaining space */
+        /* If product-title is inside product-details, it will flow naturally.
+           If it were outside .product-main, specific ordering might be needed. */
+    }
+}
+
+
+@media (max-width: 991px) { /* Планшеты (если нужны специфичные стили для этого брейкпоинта, иначе можно объединить с 768px) */
+    /* .product-main is already column for mobile-first, so 768px rule above makes it row.
+       If specific styles are needed when it becomes column again below 768px, they go here.
+       The current setup: <768px is column, >=768px is row.
+       The original CSS had a 991px breakpoint for column, which seems overridden by mobile-first.
+       Let's refine the logic based on the common pattern:
+       Mobile: column
+       Tablet+: row
+    */
+    .product-details--tablet-layout { /* Example if a different layout for details on tablet was needed */
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 30px;
+    }
+    .product-purchase-block--tablet-fixed {
+        flex: 0 0 300px;
+    }
+    .product-characteristics--tablet-flex {
+        flex: 1;
+    }
+    /* The existing @media (max-width: 991px) from original product.css had .product-main to column,
+       and .product-details to row. This is a bit conflicting with a pure mobile-first approach.
+       I'll stick to mobile-first .product-main: column, then @media (min-width: 768px) .product-main: row.
+       The inner layout of .product-details can then be adjusted if needed.
+    */
+}
+
+@media (max-width: 767px) { /* Мобильные */
+    .product-title {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+    /* .product-details remains column due to mobile-first */
+    .product-purchase-block {
+        padding: 20px;
+    }
+    .product-purchase-block__price {
+        font-size: 1.8em;
+    }
+
+    .product-gallery__arrow {
+        width: 35px;
+        height: 35px;
+        font-size: 1.2em;
+    }
+    .product-gallery__arrow--prev { left: 5px; }
+    .product-gallery__arrow--next { right: 5px; }
+
+    .product-gallery__thumb {
+        width: 54px; /* 50px img + 2px padding + 2px border */
+        height: 54px;
+    }
+    .product-gallery__thumb img {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+@media (max-width: 480px) { /* Совсем маленькие */
+     .product-title {
+        font-size: 1.6em;
+    }
+    .breadcrumbs {
+        font-size: 0.85em;
+    }
+     .product-purchase-block {
+        padding: 15px;
+    }
+     .quantity-selector__button {
+        width: 30px; height: 30px; font-size: 1em;
+    }
+     .quantity-selector__input {
+        width: 40px; height: 30px;
+    }
+    .product-purchase-block__button {
+        padding: 10px 15px;
+        font-size: 1em;
+    }
+     .product-description {
+        font-size: 0.95em;
+    }
+}

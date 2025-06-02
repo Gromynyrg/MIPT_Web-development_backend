@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import uvicorn
 
@@ -23,6 +24,22 @@ app = FastAPI(
     description="Микросервис для управления товарами (лампочками).",
     version="0.1.0",
     lifespan=lifespan
+)
+
+client_origins = [
+    "http://localhost",         # Общий для разработки
+    "http://127.0.0.1",       # Общий для разработки
+    "null",                     # Для file:///
+    "http://127.0.0.1:5501",
+    "http://localhost:5501",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=client_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.mount("/static", StaticFiles(directory=STATIC_FILES_DIR), name="static")

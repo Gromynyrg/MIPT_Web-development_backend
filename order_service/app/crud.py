@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func as sqlalchemy_func
 from typing import List, Optional, Tuple
 import uuid
 from decimal import Decimal
@@ -217,26 +218,34 @@ def get_all_orders(
         db: Session,
         skip: int = 0,
         limit: int = 20,
-        status: Optional[schemas.OrderStatusPythonEnum] = None,  # Фильтр по статусу
-        customer_email: Optional[str] = None  # Фильтр по email клиента
-        # Можно добавить другие фильтры: по дате, сумме и т.д.
-) -> List[models.Order]:
-    """
-    Получает список заказов с пагинацией и опциональными фильтрами.
-    """
+        status: Optional[schemas.OrderStatusPythonEnum] = None,
+        customer_email: Optional[str] = None,
+        search_term: Optional[str] = None  # Добавляем общий поиск
+) -> tuple[List[models.Order], int]:  # Возвращаем (items, total_count)
+
     query = db.query(models.Order)
 
     if status:
         query = query.filter(models.Order.status == status)
 
-    if customer_email:
+    if customer_email:  # Этот фильтр уже был
+        query = query.filter(models.Order.customer_email.ilike(f"%{customer_email}%"))
+
+    if search_term:
+        # Поиск по номеру заказа ИЛИ по части ФИО клиента
+        search_filter = f"%{search_term.lower()}%"
         query = query.filter(
-            models.Order.customer_email.ilike(f"%{customer_email}%"))  # Поиск по части email, без учета регистра
+            (models.Order.number.ilike(search_filter)) |
+            (sqlalchemy_func.lower(models.Order.customer_first_name).ilike(search_filter)) |
+            (sqlalchemy_func.lower(models.Order.customer_surname).ilike(search_filter)) |
+            (sqlalchemy_func.lower(models.Order.customer_email).ilike(search_filter))  # Добавим и email в общий поиск
+        )
 
-    # Сортировка по умолчанию - по дате создания (сначала новые)
-    query = query.order_by(models.Order.created_at.desc())
+    total_count = query.count()
 
-    return query.offset(skip).limit(limit).all()
+    orders = query.order_by(models.Order.created_at.desc()).offset(skip).limit(limit).all()
+
+    return orders, total_count
 
 
 def update_order_status(

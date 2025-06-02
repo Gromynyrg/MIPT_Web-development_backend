@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оформление заказа - Магазин Лампочек</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cart.css"> 
+    <link rel="stylesheet" href="css/checkout.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="container header__container">
+            <a href="index.html" class="header__logo" aria-label="Логотип Магазина Лампочек">
+                <img src="images/logo.svg" alt="Магазин Лампочек">
+            </a>
+            <div class="header__user-actions">
+                <a href="cart.html" class="header__cart-link" aria-label="Корзина">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+                         <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                    </svg>
+                </a>
+                <a href="#" class="header__user-profile" aria-label="Профиль пользователя">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-log-in">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                    <span>Вход</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <h1 class="checkout-page-title">Оформление заказа</h1>
+
+            <div class="checkout-layout">
+                <!-- Левая колонка: Формы -->
+                <div class="checkout-forms">
+                    <section class="checkout-section" aria-labelledby="recipient-details-title">
+                        <h2 id="recipient-details-title" class="checkout-section__title">Данные получателя</h2>
+                        <form id="recipient-form" class="checkout-form">
+                            <div class="form-group">
+                                <label for="surname" class="form-label">Фамилия</label>
+                                <input type="text" id="surname" name="surname" class="form-input" placeholder="Введите вашу фамилию" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="name" class="form-label">Имя</label>
+                                <input type="text" id="name" name="name" class="form-input" placeholder="Введите ваше имя" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" id="email" name="email" class="form-input" placeholder="Ваш email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone" class="form-label">Телефон</label>
+                                <input type="tel" id="phone" name="phone" class="form-input" placeholder="+7 (___) ___-__-__" required
+                                pattern="\+7\s?\(?\d{3}\)?\s?\d{3}-?\d{2}-?\d{2}">
+                                <small class="form-hint">Например: +7 (900) 123-45-67</small>
+                            </div>
+
+                            <div class="form-group delivery-options">
+                                <span class="form-label">Способ получения:</span>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="deliveryMethod" value="pickup" checked>
+                                        Самовывоз (г. Москва, ул. Трудовая, д. 18)
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="deliveryMethod" value="post">
+                                        Доставка почтой
+                                    </label>
+                                </div>
+                            </div>
+                        
+                            <div class="form-group" id="postal-address-group">
+                                <label for="address" class="form-label">Почтовый адрес</label>
+                                <textarea id="address" name="address" class="form-input form-textarea" placeholder="Город, улица, дом, квартира, индекс" rows="3"></textarea> 
+                            </div>
+                        </form>
+                    </section>
+
+                    <section class="checkout-section" id="pickup-section"> <!-- Добавлен ID для управления видимостью -->
+                        <h2 id="pickup-point-title" class="checkout-section__title">Пункт для самовывоза</h2>
+                        <div class="pickup-point-info">
+                            <div class="pickup-point-details">
+                                <p><strong>Адрес:</strong><br>г. Москва, ул. Трудовая, д. 18</p>
+                                <p><strong>Время работы:</strong><br>
+                                    Пн-Пт: 09:00 - 21:00<br>
+                                    Сб-Вс: 10:00 - 20:00
+                                </p>
+                                <p><a href="https://www.openstreetmap.org/?mlat=55.74282&mlon=37.61549#map=18/55.74282/37.61549" target="_blank" class="link-to-map">Посмотреть на OpenStreetMap</a></p>
+                            </div>
+                            <div class="pickup-point-map pickup-point-map--iframe">
+                                <iframe 
+                                    width="100%" 
+                                    height="100%" 
+                                    frameborder="0" 
+                                    scrolling="no" 
+                                    marginheight="0" 
+                                    marginwidth="0" 
+                                    src="https://www.openstreetmap.org/export/embed.html?bbox=37.612230777740486%2C55.74153087519016%2C37.61875122785569%2C55.74411085116903&layer=mapnik&marker=55.7428208631796%2C37.615490999999994" 
+                                    style="border: 1px solid var(--color-border-light);">
+                                </iframe>
+                            </div>
+                        </div>
+                        <small class="map-attribution">Карта © <a href="https://www.openstreetmap.org/copyright">участники OpenStreetMap</a></small>
+                    </section>
+                </div>
+
+                <!-- Правая колонка: Итоги заказа -->
+                <aside class="checkout-summary-sidebar">
+                    <div class="checkout-summary-block">
+                        <h2 class="checkout-summary-block__title visually-hidden">Итоги заказа</h2>
+                        <div class="summary-item">
+                            <span class="summary-item__label">Стоимость заказа:</span>
+                            <span class="summary-item__value" id="order-subtotal">16 181 ₽</span>
+                        </div>
+                        <div class="summary-item summary-item--promo">
+                            <label for="promo-code" class="summary-item__label">Промокод:</label>
+                            <div class="promo-code-group">
+                                <input type="text" id="promo-code" name="promo-code" class="form-input form-input--promo" placeholder="Введите код">
+                                <button type="button" class="button button--secondary button--apply-promo" id="apply-promo-btn">Применить</button>
+                            </div>
+                            <small class="promo-status-message" id="promo-status"></small>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-item__label">Скидка:</span>
+                            <span class="summary-item__value summary-item__value--discount" id="order-discount">-1 125 ₽</span>
+                        </div>
+                        <hr class="summary-divider">
+                        <div class="summary-item summary-item--total">
+                            <span class="summary-item__label">Итого:</span>
+                            <span class="summary-item__value summary-item__value--grand-total" id="order-grand-total">15 356 ₽</span>
+                        </div>
+                        <button type="submit" form="recipient-form" class="button button--accent checkout-summary-block__submit-button">Оформить</button>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__container">
+            <nav class="footer__nav" aria-label="Нижняя навигация">
+                <ul class="footer__list">
+                    <li class="footer__item"><a href="index.html" class="footer__link">Главная</a></li>
+                    <li class="footer__item"><a href="cart.html" class="footer__link">Корзина</a></li>
+                    <li class="footer__item"><a href="index.html" class="footer__link">Каталог</a></li>
+                    <li class="footer__item"><a href="contacts.html" class="footer__link">Контакты</a></li>
+                </ul>
+            </nav>
+
+            <div class="footer__brand-info"> <!-- Новый контейнер для лого и копирайта -->
+                <a href="index.html" class="footer__logo" aria-label="На главную - Магазин Лампочек">
+                    <img src="images/logo.svg" alt="Магазин Лампочек">
+                </a>
+                <p class="footer__copyright">(C) 2024-2025, Магазин Лампочек</p>
+            </div>
+
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/api_client.js"></script>
+    <script src="js/config_client.js"></script>
+    <script src="js/cart-logic.js"></script>
+    <script src="js/checkout.js"></script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+.confirmation-page-title {
+    font-size: 2em;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-align: center;
+    color: var(--color-text);
+}
+
+.confirmation-section {
+    background-color: var(--color-purchase-bg); /* Используем тот же фон, что и на странице заказа/корзины */
+    padding: 25px 30px;
+    border-radius: var(--border-radius);
+    max-width: 700px; /* Ограничиваем ширину блока для лучшей читаемости */
+    margin: 0 auto; /* Центрируем блок */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.confirmation-message {
+    margin-bottom: 30px;
+    line-height: 1.7;
+}
+
+.confirmation-message__title {
+    font-size: 1.5em;
+    font-weight: 600;
+    color: var(--color-text); /* Можно сделать зеленым var(--color-success, #28a745); */
+    margin-bottom: 20px;
+    text-align: center;
+}
+.confirmation-message__title #order-number {
+    color: var(--color-primary); /* Выделяем номер заказа */
+}
+
+.confirmation-message p {
+    font-size: 1em;
+    color: var(--color-text-light);
+    margin-bottom: 12px;
+}
+.confirmation-message p strong {
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+
+.pickup-info-confirmation {
+    border-top: 1px solid var(--color-border-light);
+    border-bottom: 1px solid var(--color-border-light);
+    padding: 20px 0;
+    margin-bottom: 30px;
+}
+
+.pickup-info-confirmation__title {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 15px;
+}
+
+.pickup-info-confirmation__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+.pickup-info-confirmation__details {
+    display: flex;
+    justify-content: space-between; /* Размещаем адрес и время работы по краям */
+    flex-wrap: wrap; /* Перенос на маленьких экранах */
+    gap: 15px; /* Отступ между блоками при переносе */
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+
+.pickup-info-confirmation__address,
+.pickup-info-confirmation__hours {
+    color: var(--color-text-light);
+}
+.pickup-info-confirmation__address p,
+.pickup-info-confirmation__hours p {
+    margin-top: 4px;
+}
+
+.pickup-info-confirmation__address strong,
+.pickup-info-confirmation__hours strong {
+    color: var(--color-text);
+    display: block; /* Чтобы текст под ним был с новой строки */
+    margin-bottom: 2px;
+}
+
+.pickup-info-confirmation__map-container {
+    width: 100%;
+    min-height: 200px;
+    height: 250px; /* Или aspect-ratio */
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+.pickup-info-confirmation__map-container iframe {
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--color-border-light); /* Рамка для iframe */
+    border-radius: var(--border-radius);
+}
+.map-attribution { /* Копируем из contacts.css или выносим в общий стиль */
+    display: block;
+    text-align: right;
+    font-size: 0.8em;
+    color: var(--color-text-light);
+    margin-top: 8px;
+}
+.map-attribution a {
+    color: var(--color-text-light);
+    text-decoration: underline;
+}
+
+.confirmation-actions {
+    text-align: center; /* Центрируем кнопку */
+}
+
+.confirmation-actions__button {
+    padding: 12px 30px;
+    font-size: 1.05em;
+    /* Используем .button--accent для красной кнопки (из style.css или checkout.css) */
+}
+
+
+/* Адаптивность */
+@media (max-width: 767px) {
+    .confirmation-section {
+        padding: 20px;
+    }
+    .confirmation-message__title {
+        font-size: 1.3em;
+    }
+    .confirmation-message p {
+        font-size: 0.95em;
+    }
+    .pickup-info-confirmation__details {
+        flex-direction: column; /* Адрес и время работы друг под другом */
+        gap: 10px;
+    }
+    .pickup-info-confirmation__layout {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Адаптивные колонки */
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .confirmation-page-title {
+        font-size: 1.7em;
+        margin-bottom: 20px;
+    }
+    .confirmation-section {
+        padding: 15px;
+    }
+     .confirmation-message__title {
+        font-size: 1.2em;
+    }
+    .confirmation-message p {
+        font-size: 0.9em;
+    }
+    .pickup-info-confirmation__title {
+        font-size: 1.1em;
+    }
+     .pickup-info-confirmation__details {
+        font-size: 0.9em;
+    }
+    .confirmation-actions__button {
+        width: 100%; /* Кнопка на всю ширину */
+        font-size: 1em;
+        padding: 10px 20px;
+    }
+}

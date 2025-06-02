@@ -112,3 +112,11 @@ class ProductInList(BaseModel): # Упрощенная схема для спи�
 
     class Config:
         from_attributes = True
+
+
+class ProductListResponse(BaseModel):
+    items: List[ProductInList]
+    total_count: int
+    page: Optional[int] = None # Текущая страница (если передаем skip/limit)
+    limit: Optional[int] = None # Текущий лимит (если передаем skip/limit)
+    pages: Optional[int] = None # Общее количество страниц (если передаем skip/limit)

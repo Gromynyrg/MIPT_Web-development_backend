@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from math import ceil
 import uuid
 
 from app import crud, models, schemas  # Импортируем из корневой папки app Order Service
@@ -41,23 +42,31 @@ def create_order_endpoint(order_in: schemas.OrderCreate, db: Session = Depends(g
     return created_order
 
 
-@router.get("/", response_model=List[schemas.OrderInList])
+@router.get("/", response_model=schemas.OrderListResponse)  # Обновляем response_model
 def read_all_orders_endpoint(
         skip: int = Query(0, ge=0, description="Пропустить записи"),
         limit: int = Query(20, ge=1, le=100, description="Макс. кол-во записей"),
         status: Optional[schemas.OrderStatusPythonEnum] = Query(None, description="Фильтр по статусу заказа"),
-        customer_email: Optional[str] = Query(None, description="Фильтр по email клиента (частичное совпадение)"),
+        search: Optional[str] = Query(None, min_length=1, description="Поиск по номеру заказа, ФИО или email клиента"),
         db: Session = Depends(get_db)
 ):
-    """
-    Получить список заказов с пагинацией и фильтрами.
-    По умолчанию заказы отсортированы по дате создания (сначала новые).
-    (Аутентификация/авторизация администратора будет добавлена позже для этого эндпоинта)
-    """
-    orders = crud.get_all_orders(
-        db=db, skip=skip, limit=limit, status=status, customer_email=customer_email
+    order_models, total_count = crud.get_all_orders(
+        db=db, skip=skip, limit=limit, status=status, search_term=search  # Передаем search_term
     )
-    return orders
+
+    # Конвертируем модели в Pydantic схемы OrderInList
+    items_response = [schemas.OrderInList.model_validate(order) for order in order_models]
+
+    current_page = (skip // limit) + 1 if limit > 0 else 1
+    total_pages = ceil(total_count / limit) if limit > 0 else 1
+
+    return schemas.OrderListResponse(
+        items=items_response,
+        total_count=total_count,
+        page=current_page,
+        limit=limit,
+        pages=total_pages
+    )
 
 
 @router.get("/{order_id}", response_model=schemas.Order)

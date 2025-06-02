@@ -1,0 +1,126 @@
+.contacts-page-title {
+    font-size: 2em;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-align: center;
+    color: var(--color-text);
+}
+
+.contacts-layout {
+    display: grid;
+    grid-template-columns: 1fr; /* По умолчанию одна колонка */
+    gap: 30px;
+}
+
+@media (min-width: 992px) { /* Две колонки на больших экранах */
+    .contacts-layout {
+        grid-template-columns: 1fr 1fr; /* Левая колонка для текста, правая для карты */
+        align-items: flex-start; /* Выравниваем по верху */
+    }
+    .contact-map-section {
+        position: sticky; /* Прилипание карты */
+        top: calc(var(--header-height, 60px) + 20px);
+        align-self: flex-start; /* Предотвращает растягивание */
+    }
+}
+
+
+.contact-info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 25px; /* Отступ между блоками информации */
+}
+
+.contact-block {
+    padding: 20px;
+    background-color: var(--color-background-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+}
+.contact-block:last-child {
+    margin-bottom: 0;
+}
+
+.contact-block__title {
+    font-size: 1.3em;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--color-text);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.contact-info-section p {
+    line-height: 1.7;
+    margin-bottom: 10px;
+    font-size: 0.95em;
+    color: var(--color-text-light);
+}
+.contact-info-section p:last-child {
+    margin-bottom: 0;
+}
+
+.contact-info-section strong {
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.contact-info-section a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+.contact-info-section a:hover {
+    text-decoration: underline;
+    color: var(--color-primary-dark);
+}
+
+.contact-map-section {
+    /* Стили для секции с картой */
+}
+
+.contact-map-container {
+    width: 100%;
+    min-height: 300px; /* Минимальная высота для карты */
+    height: 450px;     /* Фиксированная высота или aspect-ratio */
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background-color: var(--color-placeholder-bg); /* Фон, если iframe не загрузится */
+}
+
+.contact-map-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none; /* Убираем стандартную рамку iframe, т.к. есть у контейнера */
+    border-radius: var(--border-radius); /* Может не сработать из-за содержимого iframe */
+}
+
+.map-attribution { /* Тот же стиль, что и в checkout.css */
+    display: block;
+    text-align: right;
+    font-size: 0.8em;
+    color: var(--color-text-light);
+    margin-top: 8px;
+}
+.map-attribution a {
+    color: var(--color-text-light);
+    text-decoration: underline;
+}
+
+
+@media (max-width: 767px) {
+    .contacts-page-title {
+        font-size: 1.8em;
+    }
+    .contact-block {
+        padding: 15px;
+    }
+    .contact-block__title {
+        font-size: 1.2em;
+    }
+    .contact-info-section p {
+        font-size: 0.9em;
+    }
+    .contact-map-container {
+        height: 300px; /* Меньше высота на мобильных */
+    }
+}

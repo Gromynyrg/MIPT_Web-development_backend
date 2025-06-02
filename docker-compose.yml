@@ -83,8 +83,51 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  admin_db: # База данных для Admin Service
+    image: postgres:15-alpine
+    container_name: lampochka_admin_db
+    environment:
+      POSTGRES_USER: ${ADMIN_DB_USER:-admin_user}
+      POSTGRES_PASSWORD: ${ADMIN_DB_PASSWORD:-admin_password_db}
+      POSTGRES_DB: ${ADMIN_DB_NAME:-admin_service_db}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - admin_postgres_data:/var/lib/postgresql/data/pgdata
+      - ./db_init_scripts/admin_service:/docker-entrypoint-initdb.d
+    ports:
+      - "${ADMIN_DB_PORT:-5435}:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${ADMIN_DB_USER:-admin_user} -d ${ADMIN_DB_NAME:-admin_service_db}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  admin_service: # Микросервис Admin BFF
+    build:
+      context: ./admin_service
+      dockerfile: Dockerfile
+    container_name: lampochka_admin_service
+    environment:
+      ADMIN_DATABASE_URL: "postgresql+psycopg2://${ADMIN_DB_USER:-admin_user}:${ADMIN_DB_PASSWORD:-admin_password_db}@admin_db:5432/${ADMIN_DB_NAME:-admin_service_db}"
+      PRODUCT_SERVICE_INTERNAL_URL: "http://product_service:8000/api/v1"
+      ORDER_SERVICE_INTERNAL_URL: "http://order_service:8000/api/v1"
+      SECRET_KEY: "${JWT_SECRET_KEY:-your-super-secret-key-for-jwt-change-this}" # Из .env
+      ALGORITHM: "HS256"
+      ACCESS_TOKEN_EXPIRE_MINUTES: "1440" # 24 часа
+      PYTHONUNBUFFERED: 1
+    volumes:
+      - ./admin_service/app:/app/admin_service/app # Для разработки
+    ports:
+      - "${ADMIN_SERVICE_PORT:-8000}:8000" # Админка будет на порту 8000 хоста по умолчанию
+    depends_on:
+      admin_db:
+        condition: service_healthy
+    restart: unless-stopped
+
 
 volumes:
   product_postgres_data:
   order_postgres_data:
+  admin_postgres_data:
   product_service_static_data: {}

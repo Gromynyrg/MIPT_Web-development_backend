@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель</title>
+    <link rel="stylesheet" href="css/style.css"> <!-- Подключим общие стили -->
+    <link rel="stylesheet" href="css/admin_panel.css"> <!-- Стили для админ-панели -->
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <div class="admin-header-content">
+            <nav class="admin-nav">
+                <button id="navProducts" class="nav-button active">Товары</button>
+                <button id="navOrders" class="nav-button">Заказы</button>
+                <!-- Можно добавить другие разделы, например, Промокоды -->
+            </nav>
+            <div class="admin-user-info">
+                <span id="adminUsername">admin</span> <!-- Сюда можно будет подгружать имя пользователя -->
+                <button id="logoutButton" class="btn btn-exit">Выход</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-main-content">
+        <section id="productsSection" class="content-section active">
+            <!-- Сюда будет загружаться контент для управления товарами -->
+            <h2>Имеющиеся товары</h2>
+            <div class="actions-bar">
+                <input type="text" id="productSearch" placeholder="Поиск по названию/артикулу...">
+                <button id="addProductButton" class="btn btn-action">Добавить товар</button>
+            </div>
+            <div id="productsTableContainer">
+                <!-- Таблица товаров будет генерироваться здесь -->
+            </div>
+            <div id="productsPaginationContainer" class="pagination">
+                <!-- Пагинация для товаров -->
+            </div>
+        </section>
+
+        <section id="ordersSection" class="content-section">
+            <!-- Сюда будет загружаться контент для управления заказами -->
+            <h2>Имеющиеся заказы</h2>
+            <div class="actions-bar">
+                <input type="text" id="orderSearch" placeholder="Поиск по номеру/email...">
+                <select id="orderStatusFilter">
+                    <option value="">Все статусы</option>
+                    <!-- Статусы будут добавляться динамически -->
+                </select>
+            </div>
+            <div id="ordersTableContainer">
+                <!-- Таблица заказов будет генерироваться здесь -->
+            </div>
+            <div id="ordersPaginationContainer" class="pagination">
+                <!-- Пагинация для заказов -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Модальное окно/Попап для добавления/редактирования товара -->
+    <div id="productModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeProductModal()">×</span>
+            <h3 id="productModalTitle">Добавить товар</h3>
+            <form id="productForm">
+                <input type="hidden" id="productId"> <!-- Для редактирования -->
+
+                <div class="form-group">
+                    <label for="productName">Наименование:</label>
+                    <input type="text" id="productName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="productArticle">Артикул:</label>
+                    <input type="text" id="productArticle" name="article" required>
+                </div>
+                <div class="form-group">
+                    <label for="productDescription">Описание:</label>
+                    <textarea id="productDescription" name="description" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">Цена за единицу:</label>
+                    <input type="number" id="productPrice" name="price" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="productStock">Количество на складе:</label>
+                    <input type="number" id="productStock" name="stock_quantity" required>
+                </div>
+                <div class="form-group">
+                    <label for="productManufacturer">Производитель:</label>
+                    <input type="text" id="productManufacturer" name="manufacturer" required>
+                </div>
+                <div class="form-group">
+                    <label for="productTechnology">Технология лампы:</label>
+                    <select id="productTechnology" name="product_technology" required>
+                        <!-- Опции будут добавлены из Enum -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productSocket">Цоколь:</label>
+                    <input type="text" id="productSocket" name="socket" required>
+                </div>
+                <div class="form-group">
+                    <label for="productPower">Мощность (W):</label>
+                    <input type="number" id="productPower" name="power" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="productLumens">Световой поток (Лм):</label>
+                    <input type="number" id="productLumens" name="lumens">
+                </div>
+                <div class="form-group">
+                    <label for="productColorTemp">Цветовая темп. (K):</label>
+                    <input type="number" id="productColorTemp" name="color_temperature">
+                </div>
+                <div class="form-group">
+                    <label for="productVoltage">Напряжение (V):</label>
+                    <input type="text" id="productVoltage" name="voltage">
+                </div>
+                <div class="form-group">
+                    <label for="productEnergyClass">Класс энергоэффективности:</label>
+                    <select id="productEnergyClass" name="class_energy_efficiency">
+                        <!-- Опции будут добавлены из Enum -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productIsActive">Активен:</label>
+                    <input type="checkbox" id="productIsActive" name="is_active" checked>
+                </div>
+                <div class="form-group">
+                    <label for="productImages">Изображения:</label>
+                    <input type="file" id="productImages" name="images" multiple accept="image/*">
+                    <div id="existingImagesPreview" class="images-preview">
+                        <!-- Для отображения существующих изображений при редактировании -->
+                    </div>
+                </div>
+                <div id="productFormError" class="error-message" style="display:none;"></div>
+                <button type="submit" class="btn btn-action" id="saveProductButton">Добавить товар</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно/Попап для детализации заказа -->
+    <div id="orderModal" class="modal" style="display:none;">
+        <div class="modal-content large"> <!-- Добавим класс для увеличения ширины -->
+            <span class="close-button" onclick="closeOrderModal()">×</span>
+            <h3 id="orderModalTitle">Заказ №... от ...</h3>
+            <div id="orderDetailsContent">
+                <!-- Детали заказа будут загружены сюда -->
+            </div>
+            <div class="form-group">
+                <label for="orderStatusSelect">Статус заказа:</label>
+                <select id="orderStatusSelect" name="status"></select>
+            </div>
+            <div id="orderFormError" class="error-message" style="display:none;"></div>
+            <button id="saveOrderStatusButton" class="btn btn-action">Сохранить статус</button>
+        </div>
+    </div>
+
+
+    <script src="js/api.js"></script>
+    <script src="js/main_admin.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/orders.js"></script>
+    <!-- Позже разобьем на products.js и orders.js -->
+</body>
+</html>
