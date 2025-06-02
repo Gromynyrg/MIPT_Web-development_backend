@@ -1,132 +1,42 @@
--- Вставляем данные только если таблица products пуста, чтобы избежать дублирования при перезапусках без удаления volume
--- (Хотя docker-entrypoint-initdb.d обычно выполняется один раз при инициализации)
--- Для полной идемпотентности можно было бы проверять наличие конкретных записей.
--- Но для простоты, предположим, что это для "чистой" инициализации.
+INSERT INTO products (name, article, description, price, stock_quantity, manufacturer, product_technology, socket, power, lumens, color_temperature, voltage, class_energy_efficiency) VALUES
+('Лампа LED E27 10W Теплый Свет', 'LMP-LED-E27-10W-WW', 'Энергосберегающая светодиодная лампа, теплый белый свет.', 250.00, 100, 'LED Star', 'Светодиодная', 'E27', 10.0, 850, 3000, '220-240V', 'A+'),
+('Лампа LED E14 5W Нейтральный', 'LMP-LED-E14-5W-NW', 'Компактная светодиодная лампа-миньон, нейтральный свет.', 180.50, 150, 'EcoShine', 'Светодиодная', 'E14', 5.0, 450, 4000, '220V', 'A++'),
+('Лампа Накаливания E27 75W', 'LMP-INC-E27-75W', 'Классическая лампа накаливания для общего освещения.', 65.00, 200, 'СветЗавод', 'Накаливания', 'E27', 75.0, 930, 2700, '230V', 'E'),
+('Лампа Галогенная G9 25W', 'LMP-HAL-G9-25W', 'Капсульная галогенная лампа, яркий свет.', 110.00, 80, 'BrightLight', 'Галогенная', 'G9', 25.0, 320, 2800, '230V', 'C'),
+('Лампа LED GU10 7W Холодный', 'LMP-LED-GU10-7W-CW', 'Точечная светодиодная лампа, холодный белый свет.', 220.00, 120, 'LED Star', 'Светодиодная', 'GU10', 7.0, 600, 6000, '220-240V', 'A+'),
+('Лампа Люминесцентная T8 18W', 'LMP-FLU-T8-18W', 'Трубчатая люминесцентная лампа для офисов.', 150.00, 90, 'OfficeLine', 'Люминесцентная', 'G13', 18.0, 1350, 4000, '220-240V', 'A'),
+('Лампа Накаливания E14 40W "Свеча"', 'LMP-INC-E14-40W-CND', 'Декоративная лампа накаливания в форме свечи.', 85.00, 130, 'СветЗавод', 'Накаливания', 'E14', 40.0, 410, 2700, '230V', 'E'),
+('Лампа LED G4 2W Теплый Капсула', 'LMP-LED-G4-2W-WW-CAP', 'Миниатюрная светодиодная капсула для подсветки.', 160.00, 70, 'EcoShine', 'Светодиодная', 'G4', 2.0, 180, 3000, '12V', 'A+'),
+('Лампа Галогенная R7s 120W 78мм', 'LMP-HAL-R7S-120W-78', 'Линейная галогенная лампа для прожекторов.', 350.00, 50, 'BrightLight', 'Галогенная', 'R7s', 120.0, 2200, 2900, '230V', 'C'),
+('Лампа LED E27 15W "Филамент"', 'LMP-LED-E27-15W-FIL', 'Светодиодная филаментная лампа, винтажный стиль.', 450.00, 60, 'RetroLED', 'Светодиодная', 'E27', 15.0, 1520, 2700, '220-240V', 'A'),
+('Лампа Накаливания B22 60W (байонет)', 'LMP-INC-B22-60W', 'Лампа накаливания с байонетным цоколем B22.', 70.00, 75, 'СветЗавод', 'Накаливания', 'B22', 60.0, 700, 2700, '230V', 'E'),
+('Лампа LED GX53 8W "Таблетка"', 'LMP-LED-GX53-8W-NW', 'Плоская светодиодная лампа-таблетка, нейтральный свет.', 280.00, 110, 'LED Star', 'Светодиодная', 'GX53', 8.0, 700, 4000, '220-240V', 'A+'),
+('Лампа Другая Технология X1 50W', 'LMP-OTH-X1-50W', 'Лампа специального назначения, редкая технология.', 950.00, 20, 'SpecTech', 'Другая', 'X1-спец', 50.0, 1200, 5000, '110V', 'B'),
+('Лампа LED E27 12W Диммируемая', 'LMP-LED-E27-12W-DIM', 'Светодиодная диммируемая лампа, теплый свет.', 380.00, 95, 'EcoShine', 'Светодиодная', 'E27', 12.0, 1050, 3000, '220-240V', 'A+'),
+('Лампа Накаливания E27 100W Прозрачная', 'LMP-INC-E27-100W-CLR', 'Мощная прозрачная лампа накаливания.', 80.00, 180, 'СветЗавод', 'Накаливания', 'E27', 100.0, 1350, 2700, '230V', 'E'),
+('Лампа Галогенная GU5.3 35W MR16', 'LMP-HAL-GU53-35W-MR16', 'Низковольтная галогенная лампа MR16.', 130.00, 100, 'BrightLight', 'Галогенная', 'GU5.3', 35.0, 480, 2900, '12V', 'B'),
+('Лампа LED E14 3W "Холодильник"', 'LMP-LED-E14-3W-FRDG', 'Маленькая светодиодная лампа для холодильников.', 120.00, 140, 'EcoShine', 'Светодиодная', 'E14', 3.0, 250, 4000, '220V', 'A+'),
+('Лампа Люминесцентная Кольцевая T5 22W', 'LMP-FLU-T5-22W-RING', 'Кольцевая люминесцентная лампа.', 290.00, 40, 'OfficeLine', 'Люминесцентная', 'G10q', 22.0, 1800, 6500, '220-240V', 'A'),
+('Лампа LED Смарт E27 9W RGB+CCT', 'LMP-LED-E27-9W-SMART', 'Умная светодиодная лампа, управление цветом и температурой.', 750.00, 70, 'SmartHomeLED', 'Светодиодная', 'E27', 9.0, 800, 2700, '220-240V', 'A+'),
+('Лампа Накаливания E27 40W Матовая', 'LMP-INC-E27-40W-MAT', 'Матовая лампа накаливания, мягкий рассеянный свет.', 50.00, 220, 'СветЗавод', 'Накаливания', 'E27', 40.0, 400, 2700, '230V', 'E');
 
-INSERT INTO products (
-    name, article, description, price, stock_quantity, is_active,
-    manufacturer, product_technology, socket, power, lumens, color_temperature, voltage, class_energy_efficiency
-)
-SELECT
-    'Лампа Накаливания Е27 60Вт Классика',
-    'LMP-INC-E27-60W-C',
-    'Классическая лампа накаливания с цоколем E27, мощностью 60 Вт. Создает теплое и уютное освещение. Идеально подходит для жилых помещений.',
-    55.90,
-    150,
-    TRUE,
-    'Завод "Свет России"',
-    'Накаливания',
-    'E27',
-    60.0,
-    710,
-    2700,
-    '220-240V',
-    'E'
-WHERE NOT EXISTS (SELECT 1 FROM products WHERE article = 'LMP-INC-E27-60W-C');
-
-INSERT INTO products (
-    name, article, description, price, stock_quantity, is_active,
-    manufacturer, product_technology, socket, power, lumens, color_temperature, voltage, class_energy_efficiency
-)
-SELECT
-    'Лампа Светодиодная GU10 5Вт Нейтральный Свет',
-    'LMP-LED-GU10-5W-NW',
-    'Энергоэффективная светодиодная лампа с цоколем GU10, мощностью 5 Вт. Нейтральный белый свет (4000K), подходит для рабочих зон и офисов.',
-    149.00,
-    250,
-    TRUE,
-    'EcoLight Tech',
-    'Светодиодная',
-    'GU10',
-    5.0,
-    450,
-    4000,
-    '220-240V',
-    'A+'
-WHERE NOT EXISTS (SELECT 1 FROM products WHERE article = 'LMP-LED-GU10-5W-NW');
-
-INSERT INTO products (
-    name, article, description, price, stock_quantity, is_active,
-    manufacturer, product_technology, socket, power, lumens, color_temperature, voltage, class_energy_efficiency
-)
-SELECT
-    'Лампа Светодиодная E14 7W Теплый Свет "Свеча"',
-    'LMP-LED-E14-7W-WW-CNDL',
-    'Декоративная светодиодная лампа в форме свечи с цоколем E14 (миньон). Мощность 7 Вт, теплый белый свет (3000K). Отлично смотрится в люстрах и бра.',
-    185.50,
-    80,
-    TRUE,
-    'Aura Lamps',
-    'Светодиодная',
-    'E14',
-    7.0,
-    600,
-    3000,
-    '230V',
-    'A++'
-WHERE NOT EXISTS (SELECT 1 FROM products WHERE article = 'LMP-LED-E14-7W-WW-CNDL');
-
-INSERT INTO products (
-    name, article, description, price, stock_quantity, is_active,
-    manufacturer, product_technology, socket, power, lumens, color_temperature, voltage, class_energy_efficiency
-)
-SELECT
-    'Лампа Галогенная G9 40W Капсульная',
-    'LMP-HAL-G9-40W-CAPS',
-    'Компактная галогенная капсульная лампа с цоколем G9. Мощность 40 Вт, яркий теплый свет. Используется в точечных светильниках и подсветке.',
-    89.00,
-    120,
-    FALSE, -- Пример неактивного товара
-    'Bright Spark',
-    'Галогенная',
-    'G9',
-    40.0,
-    520,
-    2800,
-    '230V',
-    'C'
-WHERE NOT EXISTS (SELECT 1 FROM products WHERE article = 'LMP-HAL-G9-40W-CAPS');
-
-
--- Добавляем изображения для некоторых товаров
--- Для этого нам нужны product_id. Мы можем их получить, если знаем артикулы.
 
 DO $$
 DECLARE
-    product1_id UUID;
-    product2_id UUID;
-    product3_id UUID;
+    product_article TEXT;
+    product_uuid UUID;
+    image_counter INT := 1;
+    image_url_template TEXT := '/static/product_images/%s.png'; -- Шаблон URL
 BEGIN
-    -- Получаем ID для товаров по их уникальным артикулам
-    SELECT product_id INTO product1_id FROM products WHERE article = 'LMP-INC-E27-60W-C';
-    SELECT product_id INTO product2_id FROM products WHERE article = 'LMP-LED-GU10-5W-NW';
-    SELECT product_id INTO product3_id FROM products WHERE article = 'LMP-LED-E14-7W-WW-CNDL';
+    FOR product_article IN
+        SELECT article FROM products ORDER BY created_at -- Получаем артикулы в порядке их создания
+    LOOP
+        SELECT product_id INTO product_uuid FROM products WHERE article = product_article;
 
-    -- Добавляем изображения, если товары найдены
-    IF product1_id IS NOT NULL THEN
-        INSERT INTO product_images (product_id, image_url)
-        SELECT product1_id, 'https://example.com/images/LMP-INC-E27-60W-C_1.jpg'
-        WHERE NOT EXISTS (SELECT 1 FROM product_images WHERE product_id = product1_id AND image_url = 'https://example.com/images/LMP-INC-E27-60W-C_1.jpg');
-
-        INSERT INTO product_images (product_id, image_url)
-        SELECT product1_id, 'https://example.com/images/LMP-INC-E27-60W-C_2.png'
-        WHERE NOT EXISTS (SELECT 1 FROM product_images WHERE product_id = product1_id AND image_url = 'https://example.com/images/LMP-INC-E27-60W-C_2.png');
-    END IF;
-
-    IF product2_id IS NOT NULL THEN
-        INSERT INTO product_images (product_id, image_url)
-        SELECT product2_id, 'https://example.com/images/LMP-LED-GU10-5W-NW_main.webp'
-        WHERE NOT EXISTS (SELECT 1 FROM product_images WHERE product_id = product2_id AND image_url = 'https://example.com/images/LMP-LED-GU10-5W-NW_main.webp');
-    END IF;
-
-    IF product3_id IS NOT NULL THEN
-        INSERT INTO product_images (product_id, image_url)
-        SELECT product3_id, 'https://example.com/images/LMP-LED-E14-7W-WW-CNDL_front.jpg'
-        WHERE NOT EXISTS (SELECT 1 FROM product_images WHERE product_id = product3_id AND image_url = 'https://example.com/images/LMP-LED-E14-7W-WW-CNDL_front.jpg');
-
-        INSERT INTO product_images (product_id, image_url)
-        SELECT product3_id, 'https://example.com/images/LMP-LED-E14-7W-WW-CNDL_pack.jpg'
-        WHERE NOT EXISTS (SELECT 1 FROM product_images WHERE product_id = product3_id AND image_url = 'https://example.com/images/LMP-LED-E14-7W-WW-CNDL_pack.jpg');
-    END IF;
-
+        IF product_uuid IS NOT NULL AND image_counter <= 20 THEN
+            INSERT INTO product_images (product_id, image_url)
+            VALUES (product_uuid, format(image_url_template, image_counter));
+            image_counter := image_counter + 1;
+        END IF;
+    END LOOP;
 END $$;

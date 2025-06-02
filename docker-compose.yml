@@ -35,7 +35,6 @@ services:
       # PYTHONUNBUFFERED: 1 # Полезно для немедленного вывода логов Python в Docker
     volumes:
       - ./product_service/app:/app/product_service/app # Монтируем код для live reload (только для разработки!)
-      - product_service_static_data:/app/product_service/app/static
     ports:
       - "${PRODUCT_SERVICE_PORT:-8001}:8000" # Маппим порт 8000 контейнера на порт 8001 хоста
     depends_on:

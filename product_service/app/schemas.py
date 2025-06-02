@@ -20,6 +20,7 @@ class ProductImageCreate(ProductImageBase): # Используется для с
 class ProductImage(ProductImageBase): # Схема для ответа API
     product_image_id: uuid.UUID
     product_id: uuid.UUID
+    image_url: str
     upload_at: datetime
 
     class Config:

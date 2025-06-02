@@ -190,11 +190,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             products.forEach(product => {
                 const articleEl = document.createElement('article');
+                const productServiceBase = "http://localhost:8001"
+                const imageUrl = product.main_image_url
+                    ? `${productServiceBase}${product.main_image_url}`
+                    : 'https://placehold.co/250x250/e9ecef/adb5bd?text=Image';
+                console.log(imageUrl);
                 articleEl.className = 'product-card';
                 articleEl.innerHTML = `
                     <a href="product.html?id=${product.product_id}" class="product-card__link">
                         <div class="product-card__image">
-                            <img src="${product.main_image_url || 'https://placehold.co/250x250/e9ecef/adb5bd?text=Image'}" alt="${escapeHtml(product.name)}">
+                            <img src="${imageUrl}" alt="${escapeHtml(product.name)}">
                         </div>
                         <h3 class="product-card__title">${escapeHtml(product.name)}</h3>
                     </a>
@@ -204,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             data-product-id="${product.product_id}" 
                             data-product-name="${escapeHtml(product.name)}" 
                             data-product-price="${product.price}" 
-                            data-product-image="${product.main_image_url || ''}">В корзину</button>
+                            data-product-image="${imageUrl}">В корзину</button>
                     </div>
                 `;
                 productGrid.appendChild(articleEl);

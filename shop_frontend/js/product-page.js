@@ -1,19 +1,25 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const mainContent = document.querySelector('.main-content--product');
-    if (!mainContent) {
-        console.log("Not a product page, exiting product-page.js script.");
-        return; // Выходим, если это не страница товара
-    }
+    if (!mainContent) return;
 
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('id');
 
     if (!productId) {
-        mainContent.innerHTML = "<p class='container error-message'>ID товара не найден в URL. Пожалуйста, вернитесь в каталог и выберите товар.</p>";
+        mainContent.innerHTML = "<p class='container error-message'>ID товара не найден в URL.</p>";
         return;
     }
 
-    // Элементы для заполнения (получаем их один раз)
+    // Определяем базовый URL для статики один раз
+    let productServiceBaseForStatic;
+    if (typeof PRODUCT_SERVICE_API_URL === 'string') {
+        productServiceBaseForStatic = PRODUCT_SERVICE_API_URL.replace('/api/v1', '');
+    } else {
+        console.error("PRODUCT_SERVICE_API_URL not defined for product page! Using fallback.");
+        productServiceBaseForStatic = "http://localhost:8001"; // Запасной вариант
+    }
+
+    // ... (получение элементов DOM productTitleEl, mainProductImageEl, etc.) ...
     const productTitleEl = document.querySelector('.product-title');
     const breadcrumbCurrentEl = document.querySelector('.breadcrumbs__item[aria-current="page"]');
     const mainProductImageEl = document.getElementById('main-product-image');
@@ -22,60 +28,52 @@ document.addEventListener('DOMContentLoaded', async () => {
     const productDescriptionSection = document.querySelector('.product-description');
     const productCharacteristicsList = document.querySelector('.product-characteristics__list');
     const addToCartButton = document.querySelector('.product-purchase-block__button');
-    const quantityInput = document.querySelector('.quantity-selector__input'); // Счетчик количества
+    const quantityInput = document.querySelector('.quantity-selector__input');
 
-    // Проверка наличия всех ключевых элементов, прежде чем делать запрос
-    if (!productTitleEl || !breadcrumbCurrentEl || !mainProductImageEl || !productThumbnailsContainer ||
-        !productPriceEl || !productDescriptionSection || !productCharacteristicsList || !addToCartButton || !quantityInput) {
-        console.error("One or more essential page elements for product display are missing.");
-        mainContent.innerHTML = "<p class='container error-message'>Ошибка структуры страницы товара. Некоторые элементы не найдены.</p>";
-        return;
-    }
 
-    // --- Загрузка данных о товаре ---
     try {
-        mainContent.classList.add('loading'); // Для индикатора загрузки (стили нужно добавить)
-        console.log(`Fetching product with ID: ${productId}`);
+        mainContent.classList.add('loading');
         const product = await apiClientRequest(PRODUCT_SERVICE_API_URL, `/products/${productId}`);
         mainContent.classList.remove('loading');
 
         if (!product || !product.product_id) {
             throw new Error("Товар не найден или API вернул некорректные данные.");
         }
-        console.log("Product data received:", product);
 
-        // 1. Заполняем страницу данными
+        // ... (заполнение document.title, productTitleEl, breadcrumbCurrentEl, productPriceEl) ...
         document.title = `${escapeHtml(product.name)} - Магазин Лампочек`;
-        productTitleEl.textContent = escapeHtml(product.name);
-        breadcrumbCurrentEl.textContent = escapeHtml(product.name);
-        productPriceEl.textContent = `${parseFloat(product.price).toFixed(2)} ₽`;
+        if (productTitleEl) productTitleEl.textContent = escapeHtml(product.name);
+        if (breadcrumbCurrentEl) breadcrumbCurrentEl.textContent = escapeHtml(product.name);
+        if (productPriceEl) productPriceEl.textContent = `${parseFloat(product.price).toFixed(2)} ₽`;
 
-        // 2. Описание
-        let descriptionHTML = `<h2 id="product-description-title" class="product-description__title">Описание товара</h2>`;
-        descriptionHTML += `<p>${escapeHtml(product.description || "Описание для этого товара пока отсутствует.").replace(/\n/g, '<br>')}</p>`;
-        // Можно добавить циклы для генерации "Преимущества", "Применение", если они приходят как массивы/объекты
-        productDescriptionSection.innerHTML = descriptionHTML;
+        // ... (заполнение описания и характеристик) ...
+        if (productDescriptionSection) {
+            let descriptionHTML = `<h2 id="product-description-title" class="product-description__title">Описание товара</h2>`;
+            descriptionHTML += `<p>${escapeHtml(product.description || "Описание отсутствует.").replace(/\n/g, '<br>')}</p>`;
+            productDescriptionSection.innerHTML = descriptionHTML;
+        }
+        if (productCharacteristicsList) {
+            productCharacteristicsList.innerHTML = '';
+            addCharacteristic(productCharacteristicsList, "Артикул", product.article);
+            // ... (другие характеристики) ...
+            addCharacteristic(productCharacteristicsList, "Технология", product.product_technology);
+            addCharacteristic(productCharacteristicsList, "Мощность", parseFloat(product.power).toFixed(1) + 'W');
+            addCharacteristic(productCharacteristicsList, "Цоколь", product.socket);
+            addCharacteristic(productCharacteristicsList, "Производитель", product.manufacturer);
+            if(product.lumens) addCharacteristic(productCharacteristicsList, "Световой поток", product.lumens + ' Лм');
+            if(product.color_temperature) addCharacteristic(productCharacteristicsList, "Цветовая температура", product.color_temperature + 'K');
+            if(product.voltage) addCharacteristic(productCharacteristicsList, "Напряжение", product.voltage);
+            if(product.class_energy_efficiency) addCharacteristic(productCharacteristicsList, "Класс энергоэффективности", product.class_energy_efficiency);
+        }
 
-        // 3. Характеристики
-        productCharacteristicsList.innerHTML = ''; // Очищаем
-        addCharacteristic(productCharacteristicsList, "Артикул", product.article);
-        addCharacteristic(productCharacteristicsList, "Производитель", product.manufacturer);
-        addCharacteristic(productCharacteristicsList, "Технология", product.product_technology);
-        addCharacteristic(productCharacteristicsList, "Цоколь", product.socket);
-        addCharacteristic(productCharacteristicsList, "Мощность", `${parseFloat(product.power).toFixed(1)}W`);
-        if(product.lumens) addCharacteristic(productCharacteristicsList, "Световой поток", `${product.lumens} Лм`);
-        if(product.color_temperature) addCharacteristic(productCharacteristicsList, "Цветовая температура", `${product.color_temperature}K`);
-        if(product.voltage) addCharacteristic(productCharacteristicsList, "Напряжение", product.voltage);
-        if(product.class_energy_efficiency) addCharacteristic(productCharacteristicsList, "Класс энергоэффективности", product.class_energy_efficiency);
-        // Добавьте другие характеристики по аналогии
 
-
-        // 4. Галерея изображений
-        if (product.images && product.images.length > 0) {
-            mainProductImageEl.src = product.images[0].image_url;
+        // Галерея изображений
+        if (mainProductImageEl && productThumbnailsContainer && product.images && product.images.length > 0) {
+            const firstImageUrlFull = `${productServiceBaseForStatic}${product.images[0].image_url}`;
+            mainProductImageEl.src = firstImageUrlFull;
             mainProductImageEl.alt = `${escapeHtml(product.name)} - вид 1`;
 
-            productThumbnailsContainer.innerHTML = ''; // Очищаем старые миниатюры
+            productThumbnailsContainer.innerHTML = '';
 
             product.images.forEach((img, index) => {
                 const thumbButton = document.createElement('button');
@@ -83,92 +81,78 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (index === 0) thumbButton.classList.add('active');
                 thumbButton.setAttribute('aria-label', `Показать изображение ${index + 1}`);
                 thumbButton.type = 'button';
-                thumbButton.dataset.imageSrc = img.image_url; // URL из Product Service
+
+                const fullImageUrl = `${productServiceBaseForStatic}${img.image_url}`;
+                thumbButton.dataset.imageSrc = fullImageUrl; // Сохраняем ПОЛНЫЙ URL
                 thumbButton.dataset.imageAlt = `${escapeHtml(product.name)} - вид ${index + 1}`;
 
                 const thumbImg = document.createElement('img');
-                thumbImg.src = img.image_url; // URL из Product Service
+                thumbImg.src = fullImageUrl; // ПОЛНЫЙ URL для миниатюры
                 thumbImg.alt = `Миниатюра: ${escapeHtml(product.name)} - вид ${index + 1}`;
 
                 thumbButton.appendChild(thumbImg);
                 productThumbnailsContainer.appendChild(thumbButton);
             });
 
-            // Инициализация галереи (предполагаем, что window.initProductGallery есть в main.js)
             if (typeof window.initProductGallery === 'function') {
-                window.initProductGallery('.product-gallery'); // Передаем селектор галереи
+                window.initProductGallery('.product-gallery');
             } else {
-                console.warn("initProductGallery function not found. Basic thumbnail click implemented.");
-                // Базовая смена главного изображения по клику на миниатюру
+                // ... (упрощенная логика галереи, если initProductGallery нет, она должна использовать data-image-src, который теперь полный URL)
                 const thumbs = productThumbnailsContainer.querySelectorAll('.product-gallery__thumb');
                 thumbs.forEach(thumb => {
                     thumb.addEventListener('click', () => {
                         if (mainProductImageEl.src !== thumb.dataset.imageSrc) {
                              mainProductImageEl.style.opacity = '0';
                              setTimeout(() => {
-                                mainProductImageEl.src = thumb.dataset.imageSrc;
+                                mainProductImageEl.src = thumb.dataset.imageSrc; // Уже полный URL
                                 mainProductImageEl.alt = thumb.dataset.imageAlt;
                                 mainProductImageEl.style.opacity = '1';
-                             }, 150); // Соответствует transition в CSS
+                             }, 150);
                         }
                         thumbs.forEach(t => t.classList.remove('active'));
                         thumb.classList.add('active');
                     });
                 });
-                // Также нужно инициализировать стрелки, если initProductGallery нет
-                const prevButton = document.querySelector('.product-gallery__arrow--prev');
-                const nextButton = document.querySelector('.product-gallery__arrow--next');
-                if(prevButton && nextButton && product.images.length > 1) {
-                    // Упрощенная логика для стрелок (требует доработки для currentImageIndex)
-                    // Эта часть сложнее без полной логики initProductGallery
-                } else if (prevButton && nextButton) {
-                    prevButton.style.display = 'none';
-                    nextButton.style.display = 'none';
-                }
-
             }
 
-        } else { // Если изображений нет
+        } else if (mainProductImageEl) {
             mainProductImageEl.src = 'https://placehold.co/600x600/e9ecef/adb5bd?text=No+Image';
             mainProductImageEl.alt = escapeHtml(product.name);
-            productThumbnailsContainer.innerHTML = '<p>Нет дополнительных изображений.</p>';
-            const prevButton = document.querySelector('.product-gallery__arrow--prev');
-            const nextButton = document.querySelector('.product-gallery__arrow--next');
-            if(prevButton) prevButton.style.display = 'none';
-            if(nextButton) nextButton.style.display = 'none';
+            if(productThumbnailsContainer) productThumbnailsContainer.innerHTML = '<p>Нет дополнительных изображений.</p>';
         }
 
-        // 5. Кнопка "Добавить в корзину"
-        addToCartButton.onclick = () => { // Используем onclick для простоты, можно и addEventListener
-            const quantity = parseInt(quantityInput.value, 10);
-            if (isNaN(quantity) || quantity < 1) {
-                alert("Пожалуйста, выберите корректное количество (минимум 1).");
-                quantityInput.value = 1; // Сбрасываем на 1
-                return;
-            }
-            // Вызываем addToCart из cart-logic.js
-            if (typeof addToCart === 'function') {
-                addToCart({
-                    id: product.product_id,
-                    name: product.name,
-                    price: product.price, // Pydantic Decimal приходит как строка, addToCart ожидает число
-                    image: (product.images && product.images.length > 0) ? product.images[0].image_url : ''
-                }, quantity);
-
-                // Простое уведомление и изменение кнопки
-                const originalText = addToCartButton.textContent;
-                addToCartButton.textContent = 'Добавлено!';
-                addToCartButton.disabled = true;
-                setTimeout(() => {
-                    addToCartButton.textContent = originalText;
-                    addToCartButton.disabled = false;
-                }, 2000);
-
-            } else {
-                console.error("addToCart function is not defined!");
-                alert("Ошибка: функция добавления в корзину не найдена.");
-            }
-        };
+        // Кнопка "Добавить в корзину"
+        if (addToCartButton && quantityInput) {
+            addToCartButton.onclick = () => {
+                const quantity = parseInt(quantityInput.value, 10);
+                if (isNaN(quantity) || quantity < 1) {
+                    alert("Пожалуйста, выберите корректное количество (минимум 1).");
+                    quantityInput.value = 1;
+                    return;
+                }
+                if (typeof addToCart === 'function') {
+                    const mainImgForCart = (product.images && product.images.length > 0)
+                                        ? `${productServiceBaseForStatic}${product.images[0].image_url}`
+                                        : 'https://placehold.co/100x100/e9ecef/adb5bd?text=N/A';
+                    addToCart({
+                        id: product.product_id,
+                        name: product.name,
+                        price: parseFloat(product.price),
+                        image: mainImgForCart
+                    }, quantity);
+                    // ... (уведомление)
+                    const originalText = addToCartButton.textContent;
+                    addToCartButton.textContent = 'Добавлено!';
+                    addToCartButton.disabled = true;
+                    setTimeout(() => {
+                        addToCartButton.textContent = originalText;
+                        addToCartButton.disabled = false;
+                    }, 2000);
+                } else {
+                    console.error("addToCart function is not defined!");
+                }
+            };
+        }
 
     } catch (error) {
         console.error("Failed to load product details on page:", error);

@@ -339,7 +339,8 @@ window.openEditProductModal = async function(productId) {
                 imgElementContainer.style.margin = '5px';
 
                 const imgElement = document.createElement('img');
-                imgElement.src = ADMIN_SERVICE_BASE_URL.replace('/api/v1', '') + img.image_url; // Формируем полный URL для превью
+                const product_service_public_base = 'http://localhost:8001'; // ПОРТ PRODUCT SERVICE!
+                imgElement.src = `${product_service_public_base}${img.image_url}`;
                 imgElement.alt = product.name;
                 imgElement.style.width = '80px';
                 imgElement.style.height = '80px';
